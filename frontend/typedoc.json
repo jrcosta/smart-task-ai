@@ -1,0 +1,10 @@
+{
+  "$schema": "https://typedoc.org/schema.json",
+  "entryPoints": ["src"],
+  "out": "docs/frontend",
+  "tsconfig": "tsconfig.json",
+  "exclude": ["**/*.test.ts", "**/*.test.tsx", "**/__tests__/**"],
+  "readme": "none",
+  "categorizeByGroup": true,
+  "sort": ["kind", "source-order"]
+}
