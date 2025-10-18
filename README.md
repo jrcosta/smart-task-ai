@@ -328,8 +328,15 @@ Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para ma
 
 ## 👨‍💻 Autor
 
-Desenvolvido com ❤️ para demonstrar habilidades full-stack com Java e React.
+Desenvolvido com ❤️ utilizando **GitHub Student Pack** e **GitHub Copilot Pro** como ferramentas principais para aprofundar o aprendizado em **Java**, **Inteligência Artificial** e **GitHub Copilot**. Este projeto demonstra como aplicar essas tecnologias em uma solução full-stack completa.
 
 ---
 
 ⭐ Se este projeto foi útil para você, considere dar uma estrela no GitHub!
+
+**Tecnologias de Desenvolvimento:**
+- 🎓 GitHub Student Pack
+- 🤖 GitHub Copilot Pro
+- ☕ Java & Spring Boot
+- 🧠 OpenAI & Inteligência Artificial
+- ⚛️ React & TypeScript
