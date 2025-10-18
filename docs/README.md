@@ -2,10 +2,10 @@
 
 Um gerenciador de tarefas inteligente com integração de IA, desenvolvido com **Java Spring Boot** no backend e **React + TypeScript** no frontend.
 
-![Java](https://img.shields.io/badge/Java-25-orange)
+![Java](https://img.shields.io/badge/Java-17-orange)
 ![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.2-green)
-![React](https://img.shields.io/badge/React-19-blue)
-![TypeScript](https://img.shields.io/badge/TypeScript-4.9-blue)
+![React](https://img.shields.io/badge/React-18-blue)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.2-blue)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15-blue)
 
 ## ✨ Funcionalidades
@@ -58,7 +58,7 @@ Um gerenciador de tarefas inteligente com integração de IA, desenvolvido com *
 
 ## 📋 Pré-requisitos
 
-- **Java 25+**
+- **Java 17+**
 - **Node.js 18+**
 - **Maven 3.8+**
 - **PostgreSQL 15+** (ou use H2 para desenvolvimento)
@@ -70,8 +70,8 @@ Um gerenciador de tarefas inteligente com integração de IA, desenvolvido com *
 
 1. Clone o repositório:
 ```bash
-git clone https://github.com/jrcosta/smart-task-ai.git
-cd smart-task-ai
+git clone https://github.com/seu-usuario/smart-task-manager.git
+cd smart-task-manager
 ```
 
 2. Configure as variáveis de ambiente:
@@ -152,7 +152,7 @@ Para receber notificações no WhatsApp:
 4. Configure no arquivo `.env` do backend
 5. Acesse a página de Notificações no app e configure seu número
 
-**Guia completo**: Veja o arquivo [WHATSAPP_SETUP.md](docs/WHATSAPP_SETUP.md) para instruções detalhadas.
+**Guia completo**: Veja o arquivo [WHATSAPP_SETUP.md](WHATSAPP_SETUP.md) para instruções detalhadas.
 
 ## � Documentação do Projeto
 
