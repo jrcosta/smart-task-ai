@@ -1,6 +1,8 @@
 package com.smarttask.service;
 
 import com.smarttask.model.Task;
+import com.smarttask.observability.MetricsService;
+import com.smarttask.observability.Traced;
 import com.twilio.Twilio;
 import com.twilio.rest.api.v2010.account.Message;
 import com.twilio.type.PhoneNumber;
@@ -31,6 +33,12 @@ public class WhatsAppService {
     private String twilioWhatsAppNumber;
 
     private boolean twilioConfigured = false;
+    
+    private final MetricsService metricsService;
+    
+    public WhatsAppService(MetricsService metricsService) {
+        this.metricsService = metricsService;
+    }
 
     @PostConstruct
     public void init() {
@@ -49,6 +57,7 @@ public class WhatsAppService {
         }
     }
 
+    @Traced("WhatsAppService.sendDailyTaskReminder")
     public void sendDailyTaskReminder(String toNumber, String userName, List<Task> tasks) {
         StringBuilder message = new StringBuilder();
         message.append("🌅 *Bom dia, ").append(userName).append("!*\n\n");
@@ -94,9 +103,10 @@ public class WhatsAppService {
             message.append("💪 Você consegue! Boa sorte!");
         }
 
-        sendMessage(toNumber, message.toString());
+        sendMessage(toNumber, message.toString(), "daily_reminder");
     }
 
+    @Traced("WhatsAppService.sendOverdueAlert")
     public void sendOverdueAlert(String toNumber, String userName, List<Task> overdueTasks) {
         if (overdueTasks.isEmpty()) {
             return;
@@ -118,9 +128,10 @@ public class WhatsAppService {
 
         message.append("\n🚀 Que tal resolver essas tarefas hoje?");
 
-        sendMessage(toNumber, message.toString());
+        sendMessage(toNumber, message.toString(), "overdue_alert");
     }
 
+    @Traced("WhatsAppService.sendCompletionSummary")
     public void sendCompletionSummary(String toNumber, String userName, int completedToday, int totalHours) {
         StringBuilder message = new StringBuilder();
         message.append("🎉 *Parabéns, ").append(userName).append("!*\n\n");
@@ -132,9 +143,10 @@ public class WhatsAppService {
         
         message.append("\n✨ Continue assim! Você está indo muito bem! 💪");
 
-        sendMessage(toNumber, message.toString());
+        sendMessage(toNumber, message.toString(), "completion_summary");
     }
 
+    @Traced("WhatsAppService.sendTestMessage")
     public void sendTestMessage(String toNumber, String userName) {
         String message = String.format(
             "🤖 *Olá, %s!*\n\n" +
@@ -144,10 +156,10 @@ public class WhatsAppService {
             userName
         );
 
-        sendMessage(toNumber, message);
+        sendMessage(toNumber, message, "test_message");
     }
 
-    private void sendMessage(String toNumber, String messageBody) {
+    private void sendMessage(String toNumber, String messageBody, String messageType) {
         if (!StringUtils.hasText(toNumber)) {
             log.warn("Tentativa de envio de WhatsApp sem número de destino. Mensagem descartada.");
             return;
@@ -157,12 +169,14 @@ public class WhatsAppService {
 
         if (!twilioConfigured) {
             log.info("📱 [SIMULAÇÃO] Mensagem WhatsApp para {}: \n{}", sanitizedTo, messageBody);
+            metricsService.recordWhatsAppMessage(messageType);
             return;
         }
 
         if (!StringUtils.hasText(twilioWhatsAppNumber)) {
             log.error("Twilio configurado sem número de origem. Mensagem enviada em modo de simulação para {}.", sanitizedTo);
             log.info("📱 [FALLBACK] Mensagem WhatsApp para {}: \n{}", sanitizedTo, messageBody);
+            metricsService.recordWhatsAppMessage(messageType);
             return;
         }
 
@@ -179,10 +193,12 @@ public class WhatsAppService {
             ).create();
 
             log.info("WhatsApp message sent successfully. SID: {}", message.getSid());
+            metricsService.recordWhatsAppMessage(messageType);
         } catch (Exception e) {
             log.error("Falha ao enviar WhatsApp para {}: {}", sanitizedTo, e.getMessage());
             // Fallback para simulação em caso de erro
             log.info("📱 [FALLBACK] Mensagem WhatsApp para {}: \n{}", sanitizedTo, messageBody);
+            metricsService.recordWhatsAppMessage(messageType + "_failed");
         }
     }
 }

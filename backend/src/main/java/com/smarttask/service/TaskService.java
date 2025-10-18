@@ -8,6 +8,8 @@ import com.smarttask.exception.ResourceNotFoundException;
 import com.smarttask.model.Task;
 import com.smarttask.model.Task.TaskStatus;
 import com.smarttask.model.User;
+import com.smarttask.observability.MetricsService;
+import com.smarttask.observability.Traced;
 import com.smarttask.repository.TaskRepository;
 import com.smarttask.repository.UserRepository;
 import com.smarttask.security.UserPrincipal;
@@ -31,9 +33,13 @@ public class TaskService {
     private final TaskRepository taskRepository;
     private final UserRepository userRepository;
     private final AIService aiService;
+    private final MetricsService metricsService;
 
     @Transactional
+    @Traced(value = "TaskService.createTask", captureParameters = true)
     public TaskResponse createTask(TaskRequest request, UserPrincipal currentUser) {
+        long startTime = System.currentTimeMillis();
+        
         User user = userRepository.findById(currentUser.getId())
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
@@ -55,11 +61,18 @@ public class TaskService {
         }
 
         task = taskRepository.save(task);
+        
+        metricsService.recordTaskCreated(task.getPriority().toString());
+        metricsService.recordTaskDuration(System.currentTimeMillis() - startTime, "create");
+        
         return mapToResponse(task);
     }
 
     @Transactional
+    @Traced(value = "TaskService.createTaskWithAI", captureParameters = true)
     public TaskResponse createTaskWithAI(TaskRequest request, UserPrincipal currentUser) {
+        long startTime = System.currentTimeMillis();
+        
         // Analisa a tarefa com IA antes de criar
         AIAnalysisRequest aiRequest = new AIAnalysisRequest();
         aiRequest.setText(request.getTitle() + " " + (request.getDescription() != null ? request.getDescription() : ""));
@@ -98,17 +111,25 @@ public class TaskService {
             }
         }
 
+        metricsService.recordTaskCreated(task.getPriority().toString());
+        metricsService.recordTaskDuration(System.currentTimeMillis() - startTime, "create_with_ai");
+        
         return mapToResponse(taskRepository.findById(task.getId()).orElseThrow());
     }
 
     @Transactional(readOnly = true)
+    @Traced("TaskService.getAllTasks")
     public List<TaskResponse> getAllTasks(UserPrincipal currentUser) {
-        return taskRepository.findByUserId(currentUser.getId()).stream()
+        long startTime = System.currentTimeMillis();
+        List<TaskResponse> tasks = taskRepository.findByUserId(currentUser.getId()).stream()
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());
+        metricsService.recordTaskDuration(System.currentTimeMillis() - startTime, "list_all");
+        return tasks;
     }
 
     @Transactional(readOnly = true)
+    @Traced("TaskService.getTasksByStatus")
     public List<TaskResponse> getTasksByStatus(TaskStatus status, UserPrincipal currentUser) {
         return taskRepository.findByUserIdAndStatus(currentUser.getId(), status).stream()
                 .map(this::mapToResponse)
@@ -116,6 +137,7 @@ public class TaskService {
     }
 
     @Transactional(readOnly = true)
+    @Traced("TaskService.getTaskById")
     public TaskResponse getTaskById(Long id, UserPrincipal currentUser) {
         Task task = taskRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Task not found"));
@@ -128,7 +150,10 @@ public class TaskService {
     }
 
     @Transactional
+    @Traced(value = "TaskService.updateTask", captureParameters = true)
     public TaskResponse updateTask(Long id, TaskRequest request, UserPrincipal currentUser) {
+        long startTime = System.currentTimeMillis();
+        
         Task task = taskRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Task not found"));
 
@@ -146,14 +171,20 @@ public class TaskService {
 
         if (request.getStatus() == TaskStatus.COMPLETED && task.getCompletedAt() == null) {
             task.setCompletedAt(LocalDateTime.now());
+            metricsService.recordTaskCompleted();
         }
 
         task = taskRepository.save(task);
+        metricsService.recordTaskDuration(System.currentTimeMillis() - startTime, "update");
+        
         return mapToResponse(task);
     }
 
     @Transactional
+    @Traced("TaskService.deleteTask")
     public void deleteTask(Long id, UserPrincipal currentUser) {
+        long startTime = System.currentTimeMillis();
+        
         Task task = taskRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Task not found"));
 
@@ -162,9 +193,12 @@ public class TaskService {
         }
 
         taskRepository.delete(task);
+        metricsService.recordTaskDeleted();
+        metricsService.recordTaskDuration(System.currentTimeMillis() - startTime, "delete");
     }
 
     @Transactional(readOnly = true)
+    @Traced("TaskService.getOverdueTasks")
     public List<TaskResponse> getOverdueTasks(UserPrincipal currentUser) {
         return taskRepository.findOverdueTasks(currentUser.getId(), LocalDateTime.now()).stream()
                 .map(this::mapToResponse)

@@ -35,6 +35,11 @@ Thumbs.db
 *.log
 logs/
 
+# Observability data (não commitar dados locais)
+observability/data/
+prometheus_data/
+grafana_data/
+
 # Database
 *.db
 *.sqlite
