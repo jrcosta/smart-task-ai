@@ -43,6 +43,43 @@ twilio:
   auth-token: ${TWILIO_AUTH_TOKEN:}
   whatsapp-number: ${TWILIO_WHATSAPP_NUMBER:}
 
+# Configurações OpenTelemetry
+otel:
+  traces:
+    enabled: true
+  metrics:
+    enabled: true
+  exporter:
+    jaeger:
+      endpoint: ${OTEL_EXPORTER_JAEGER_ENDPOINT:http://localhost:14250}
+    otlp:
+      endpoint: ${OTEL_EXPORTER_OTLP_ENDPOINT:http://localhost:4317}
+
+# Configurações do Spring Boot Actuator
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus,traces
+      base-path: /actuator
+  endpoint:
+    health:
+      show-details: always
+    metrics:
+      enabled: true
+    prometheus:
+      enabled: true
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+    distribution:
+      percentiles-histogram:
+        http.server.requests: true
+  tracing:
+    sampling:
+      probability: 1.0
+
 ---
 # Profile de desenvolvimento
 spring:

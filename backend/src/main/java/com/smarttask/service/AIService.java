@@ -3,6 +3,8 @@ package com.smarttask.service;
 import com.smarttask.dto.AIAnalysisRequest;
 import com.smarttask.dto.AIAnalysisResponse;
 import com.smarttask.model.Task.TaskPriority;
+import com.smarttask.observability.MetricsService;
+import com.smarttask.observability.Traced;
 import com.theokanning.openai.completion.chat.ChatCompletionRequest;
 import com.theokanning.openai.completion.chat.ChatMessage;
 import com.theokanning.openai.service.OpenAiService;
@@ -34,8 +36,18 @@ public class AIService {
 
     @Value("${openai.max-tokens}")
     private Integer maxTokens;
+    
+    private final MetricsService metricsService;
+    
+    public AIService(MetricsService metricsService) {
+        this.metricsService = metricsService;
+    }
 
+    @Traced(value = "AIService.analyzeTask", captureParameters = true)
     public AIAnalysisResponse analyzeTask(AIAnalysisRequest request) {
+        long startTime = System.currentTimeMillis();
+        boolean success = false;
+        
         try {
             // Verifica se a API key está configurada
             if (apiKey == null || apiKey.equals("your-api-key-here")) {
@@ -62,11 +74,16 @@ public class AIService {
             String response = service.createChatCompletion(completionRequest)
                     .getChoices().get(0).getMessage().getContent();
 
+            success = true;
+            metricsService.recordAIAnalysis(true);
             return parseAIResponse(response);
 
         } catch (Exception e) {
             log.error("Error calling OpenAI API: ", e);
+            metricsService.recordAIAnalysis(false);
             return createMockAnalysis(request.getText());
+        } finally {
+            metricsService.recordAIAnalysisDuration(System.currentTimeMillis() - startTime);
         }
     }
 

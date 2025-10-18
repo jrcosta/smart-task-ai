@@ -6,6 +6,8 @@ import com.smarttask.dto.RegisterRequest;
 import com.smarttask.exception.ResourceAlreadyExistsException;
 import com.smarttask.exception.ResourceNotFoundException;
 import com.smarttask.model.User;
+import com.smarttask.observability.MetricsService;
+import com.smarttask.observability.Traced;
 import com.smarttask.repository.UserRepository;
 import com.smarttask.security.UserPrincipal;
 import com.smarttask.security.JwtTokenProvider;
@@ -34,8 +36,10 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     private final JwtTokenProvider tokenProvider;
+    private final MetricsService metricsService;
 
     @Transactional
+    @Traced(value = "AuthService.register", captureParameters = false)
     public AuthResponse register(RegisterRequest request) {
         if (userRepository.existsByUsername(request.getUsername())) {
             throw new ResourceAlreadyExistsException("Username already exists");
@@ -62,6 +66,8 @@ public class AuthService {
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
         String token = tokenProvider.generateToken(authentication);
+        
+        metricsService.recordAuthenticationSuccess("register");
 
         return AuthResponse.builder()
                 .token(token)
@@ -73,29 +79,37 @@ public class AuthService {
                 .build();
     }
 
+    @Traced(value = "AuthService.login", captureParameters = false)
     public AuthResponse login(AuthRequest request) {
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword())
-        );
+        try {
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword())
+            );
 
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-        String token = tokenProvider.generateToken(authentication);
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+            String token = tokenProvider.generateToken(authentication);
 
-    Long userId = ((UserPrincipal) authentication.getPrincipal()).getId();
+            Long userId = ((UserPrincipal) authentication.getPrincipal()).getId();
 
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> {
-                    log.warn("Usuário autenticado não encontrado ao finalizar login (id={})", userId);
-                    return new ResourceNotFoundException("Usuário não encontrado");
-                });
+            User user = userRepository.findById(userId)
+                    .orElseThrow(() -> {
+                        log.warn("Usuário autenticado não encontrado ao finalizar login (id={})", userId);
+                        return new ResourceNotFoundException("Usuário não encontrado");
+                    });
+            
+            metricsService.recordAuthenticationSuccess("login");
 
-        return AuthResponse.builder()
-                .token(token)
-                .type("Bearer")
-                .id(user.getId())
-                .username(user.getUsername())
-                .email(user.getEmail())
-                .roles(user.getRoles())
-                .build();
+            return AuthResponse.builder()
+                    .token(token)
+                    .type("Bearer")
+                    .id(user.getId())
+                    .username(user.getUsername())
+                    .email(user.getEmail())
+                    .roles(user.getRoles())
+                    .build();
+        } catch (Exception e) {
+            metricsService.recordAuthenticationFailure(e.getClass().getSimpleName());
+            throw e;
+        }
     }
 }

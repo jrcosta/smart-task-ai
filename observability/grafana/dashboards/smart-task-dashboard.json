@@ -1,0 +1,210 @@
+{
+  "dashboard": {
+    "title": "Smart Task Manager - Dashboard de Observabilidade",
+    "tags": ["smart-task", "observability"],
+    "timezone": "browser",
+    "panels": [
+      {
+        "id": 1,
+        "title": "Total de Tarefas Criadas",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "sum(tasks_created_total)",
+            "refId": "A"
+          }
+        ],
+        "gridPos": {
+          "h": 4,
+          "w": 6,
+          "x": 0,
+          "y": 0
+        }
+      },
+      {
+        "id": 2,
+        "title": "Total de Tarefas Completadas",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "sum(tasks_completed_total)",
+            "refId": "A"
+          }
+        ],
+        "gridPos": {
+          "h": 4,
+          "w": 6,
+          "x": 6,
+          "y": 0
+        }
+      },
+      {
+        "id": 3,
+        "title": "Análises de IA",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "sum(ai_analysis_requests_total)",
+            "refId": "A"
+          }
+        ],
+        "gridPos": {
+          "h": 4,
+          "w": 6,
+          "x": 12,
+          "y": 0
+        }
+      },
+      {
+        "id": 4,
+        "title": "Mensagens WhatsApp Enviadas",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "sum(whatsapp_messages_sent_total)",
+            "refId": "A"
+          }
+        ],
+        "gridPos": {
+          "h": 4,
+          "w": 6,
+          "x": 18,
+          "y": 0
+        }
+      },
+      {
+        "id": 5,
+        "title": "Taxa de Criação de Tarefas (por minuto)",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "rate(tasks_created_total[5m]) * 60",
+            "refId": "A",
+            "legendFormat": "Taxa de criação"
+          }
+        ],
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 0,
+          "y": 4
+        }
+      },
+      {
+        "id": 6,
+        "title": "Duração Média das Operações de Tarefas",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "rate(tasks_duration_milliseconds_sum[5m]) / rate(tasks_duration_milliseconds_count[5m])",
+            "refId": "A",
+            "legendFormat": "{{operation}}"
+          }
+        ],
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 12,
+          "y": 4
+        }
+      },
+      {
+        "id": 7,
+        "title": "Autenticações Bem-sucedidas vs Falhas",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "rate(auth_success_total[5m]) * 60",
+            "refId": "A",
+            "legendFormat": "Sucesso"
+          },
+          {
+            "expr": "rate(auth_failures_total[5m]) * 60",
+            "refId": "B",
+            "legendFormat": "Falhas"
+          }
+        ],
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 0,
+          "y": 12
+        }
+      },
+      {
+        "id": 8,
+        "title": "Duração das Análises de IA",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "rate(ai_analysis_duration_milliseconds_sum[5m]) / rate(ai_analysis_duration_milliseconds_count[5m])",
+            "refId": "A",
+            "legendFormat": "Duração média (ms)"
+          }
+        ],
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 12,
+          "y": 12
+        }
+      },
+      {
+        "id": 9,
+        "title": "Requisições HTTP por Endpoint",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "rate(http_server_requests_seconds_count[5m]) * 60",
+            "refId": "A",
+            "legendFormat": "{{uri}} - {{method}}"
+          }
+        ],
+        "gridPos": {
+          "h": 8,
+          "w": 24,
+          "x": 0,
+          "y": 20
+        }
+      },
+      {
+        "id": 10,
+        "title": "Tarefas Criadas por Prioridade",
+        "type": "piechart",
+        "targets": [
+          {
+            "expr": "sum by (priority) (tasks_created_total)",
+            "refId": "A",
+            "legendFormat": "{{priority}}"
+          }
+        ],
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 0,
+          "y": 28
+        }
+      },
+      {
+        "id": 11,
+        "title": "Mensagens WhatsApp por Tipo",
+        "type": "piechart",
+        "targets": [
+          {
+            "expr": "sum by (type) (whatsapp_messages_sent_total)",
+            "refId": "A",
+            "legendFormat": "{{type}}"
+          }
+        ],
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 12,
+          "y": 28
+        }
+      }
+    ],
+    "schemaVersion": 16,
+    "version": 0
+  }
+}
