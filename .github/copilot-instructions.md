@@ -128,6 +128,19 @@ docker-compose -f infrastructure/docker-compose-observability.yml up -d  # Stack
 - **SEMPRE** abra novo terminal para qualquer comando
 - Use `isBackground=true` para processos de longa duração
 
+### Git & Branches (OBRIGATÓRIO)
+- **TODA mudança deve ser criada em uma branch nova** (nunca commitar direto em `master`)
+- **Convenção de branch**: `feature/nome-da-feature`, `bugfix/nome-do-bug`, `docs/nome-do-doc`
+- **Exemplo**: 
+  ```bash
+  git checkout -b feature/adicionar-autenticacao-2fa
+  git commit -m "Adicionar autenticação 2FA"
+  git push origin feature/adicionar-autenticacao-2fa
+  ```
+- **Pull Request obrigatório**: Toda mudança deve ser enviada como um novo PR para revisão
+- **PR deve incluir**: Descrição clara, testes, documentação atualizada
+- **Review antes do merge**: Nunca fazer merge direto sem revisão
+
 ### Dependências
 - **Versões CONGELADAS**: Java 25, Spring Boot 3.2, React 19, Maven, Node 18+
 - **Alterar versão REQUER** autorização explícita ("pode alterar a versão")
