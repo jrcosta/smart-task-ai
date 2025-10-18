@@ -26,6 +26,18 @@ server:
   servlet:
     context-path: /api
 
+# SpringDoc OpenAPI (Swagger)
+springdoc:
+  api-docs:
+    path: /docs
+  swagger-ui:
+    path: /swagger-ui.html
+    enabled: true
+    operationsSorter: method
+    tagsSorter: alpha
+    tryItOutEnabled: true
+  show-actuator: true
+
 # Configurações JWT
 jwt:
   secret: ${JWT_SECRET:sua-chave-secreta-muito-segura-aqui-mude-em-producao}

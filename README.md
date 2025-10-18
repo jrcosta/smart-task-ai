@@ -214,100 +214,43 @@ npm run docs
 
 Os arquivos gerados ficarão em `frontend/docs/frontend/index.html`. Basta abrir no navegador para navegar pelas referências.
 
-## �📚 Documentação da API
+## 📚 Documentação da API (Swagger/OpenAPI)
 
-### Autenticação
+A API é totalmente documentada com **Swagger/OpenAPI 3.0** e gerada automaticamente a partir do código.
 
-#### Registrar
-```http
-POST /api/auth/register
-Content-Type: application/json
+### 🔍 Acessar Documentação Interativa
 
-{
-  "username": "usuario",
-  "email": "usuario@exemplo.com",
-  "password": "senha123",
-  "fullName": "Nome Completo"
-}
-```
+Após iniciar o backend (`mvn spring-boot:run` ou Docker), acesse:
 
-#### Login
-```http
-POST /api/auth/login
-Content-Type: application/json
+- **Swagger UI**: http://localhost:8080/api/swagger-ui.html
+- **OpenAPI JSON**: http://localhost:8080/api/docs
+- **OpenAPI YAML**: http://localhost:8080/api/docs.yaml
 
-{
-  "username": "usuario",
-  "password": "senha123"
-}
-```
+### 🧪 Testar Endpoints
 
-### Tarefas
+No Swagger UI você pode:
+- ✅ Visualizar todos os endpoints disponíveis
+- ✅ Ver detalhes de request/response
+- ✅ Testar endpoints diretamente (com autenticação JWT)
+- ✅ Baixar a especificação OpenAPI
 
-#### Listar todas as tarefas
-```http
-GET /api/tasks
-Authorization: Bearer {token}
-```
+### 🔐 Autenticação JWT
 
-#### Criar tarefa
-```http
-POST /api/tasks
-Authorization: Bearer {token}
-Content-Type: application/json
+1. Registre um usuário via endpoint `/auth/register`
+2. Faça login em `/auth/login` para obter o token
+3. Clique no botão "Authorize" no Swagger UI
+4. Cole o token no formato: `Bearer {seu-token-aqui}`
+5. Todos os endpoints protegidos estarão disponíveis
 
-{
-  "title": "Minha tarefa",
-  "description": "Descrição detalhada",
-  "priority": "HIGH",
-  "dueDate": "2024-12-31T23:59:59",
-  "tags": ["trabalho", "urgente"]
-}
-```
+### 📊 Endpoints Principais
 
-#### Criar tarefa com IA
-```http
-POST /api/tasks/ai
-Authorization: Bearer {token}
-Content-Type: application/json
+No Swagger UI você encontrará documentação completa para:
+- **Autenticação**: POST `/auth/register`, POST `/auth/login`
+- **Tarefas**: GET/POST `/tasks`, GET/PUT/DELETE `/tasks/{id}`
+- **IA**: POST `/tasks/ai`, POST `/ai/analyze`
+- **Notificações**: GET/POST `/notifications`
 
-{
-  "title": "Implementar autenticação no sistema",
-  "description": "Adicionar login e registro de usuários com JWT"
-}
-```
-
-#### Atualizar tarefa
-```http
-PUT /api/tasks/{id}
-Authorization: Bearer {token}
-Content-Type: application/json
-
-{
-  "title": "Tarefa atualizada",
-  "status": "COMPLETED"
-}
-```
-
-#### Deletar tarefa
-```http
-DELETE /api/tasks/{id}
-Authorization: Bearer {token}
-```
-
-### IA
-
-#### Analisar texto
-```http
-POST /api/ai/analyze
-Authorization: Bearer {token}
-Content-Type: application/json
-
-{
-  "text": "Criar documentação completa do projeto",
-  "context": "Projeto de gerenciador de tarefas"
-}
-```
+**Todos os endpoints incluem**: parâmetros, tipos de resposta, códigos HTTP e exemplos de uso.
 
 ## 🏗️ Arquitetura
 
