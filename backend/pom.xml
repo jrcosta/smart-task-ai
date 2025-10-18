@@ -22,7 +22,7 @@
         <java.version>25</java.version>
         <maven.compiler.source>25</maven.compiler.source>
         <maven.compiler.target>25</maven.compiler.target>
-        <lombok.version>1.18.30</lombok.version>
+        <lombok.version>1.18.40</lombok.version>
         <opentelemetry.version>1.32.0</opentelemetry.version>
         <opentelemetry-instrumentation.version>1.32.0</opentelemetry-instrumentation.version>
     </properties>
@@ -107,13 +107,14 @@
             <version>9.14.1</version>
         </dependency>
         
-        <!-- Lombok -->
+        <!-- Lombok - versão compatível com Java 25 -->
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>${lombok.version}</version>
+            <version>1.18.34</version>
             <scope>provided</scope>
         </dependency>
+
         
         <!-- OpenTelemetry -->
         <dependency>
@@ -185,12 +186,12 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.13.0</version>
                 <configuration>
-                    <release>17</release>
+                    <release>25</release>
                     <annotationProcessorPaths>
                         <path>
                             <groupId>org.projectlombok</groupId>
                             <artifactId>lombok</artifactId>
-                            <version>${lombok.version}</version>
+                            <version>1.18.34</version>
                         </path>
                     </annotationProcessorPaths>
                 </configuration>
@@ -204,10 +205,14 @@
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <version>3.6.3</version>
                 <configuration>
-                    <source>${java.version}</source>
+                    <source>21</source>
+                    <javadocVersion>21</javadocVersion>
                     <encoding>UTF-8</encoding>
                     <failOnError>false</failOnError>
                     <doclint>none</doclint>
+                    <additionalJOptions>
+                        <additionalJOption>-Xdoclint:none</additionalJOption>
+                    </additionalJOptions>
                 </configuration>
             </plugin>
         </plugins>
