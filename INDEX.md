@@ -10,7 +10,9 @@ smart-task-ai/
 ├── frontend/             # Frontend React com TypeScript
 ├── docs/                 # 📖 Documentação do projeto
 ├── scripts/              # 🔧 Scripts de inicialização e utilitários
-├── docker-compose.yml    # Composição Docker
+├── infrastructure/       # 🐳 Docker Compose e observabilidade
+├── observability/        # 📊 Configurações de observabilidade (Prometheus, Grafana)
+├── docker-compose.yml    # Composição Docker (em infrastructure/)
 ├── README.md             # Documentação principal
 └── INDEX.md              # Este arquivo
 ```
@@ -45,9 +47,31 @@ Execute os scripts da pasta `scripts/` para iniciar o projeto:
 
 # Iniciar frontend
 ./scripts/start-frontend.sh
+
+# Validar observabilidade
+./scripts/validate-observability.sh
 ```
 
 **Nota para WSL**: Use `bash scripts/nome-do-script.sh` se encontrar erros de permissão.
+
+## 🐳 Infrastructure (pasta `infrastructure/`)
+
+Configurações de Docker e observabilidade:
+
+```bash
+# Iniciar aplicação completa (Docker Compose)
+docker-compose -f infrastructure/docker-compose.yml up -d
+
+# Iniciar stack de observabilidade (Prometheus, Grafana, Jaeger)
+docker-compose -f infrastructure/docker-compose-observability.yml up -d
+
+# Acessar:
+# - Prometheus: http://localhost:9090
+# - Grafana: http://localhost:3000
+# - Jaeger UI: http://localhost:16686
+```
+
+Veja [`infrastructure/README.md`](infrastructure/README.md) para mais detalhes.
 
 ## 🚀 Como Começar
 

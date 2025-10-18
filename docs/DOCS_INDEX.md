@@ -22,6 +22,16 @@ Bem-vindo à documentação do Smart Task Manager! Navegue pelos documentos abai
 
 - **[SECURITY_IMPROVEMENTS.md](SECURITY_IMPROVEMENTS.md)** - Medidas de segurança implementadas
 
+## 📊 Observabilidade & Monitoramento
+
+- **[OBSERVABILITY.md](OBSERVABILITY.md)** - Guia completo de observabilidade
+- **[OBSERVABILITY_POINTS.md](OBSERVABILITY_POINTS.md)** - Pontos de instrumentação no código
+- **[QUICKSTART_OBSERVABILITY.md](QUICKSTART_OBSERVABILITY.md)** - Guia rápido para observabilidade
+
+## 📋 Implementação
+
+- **[IMPLEMENTATION_SUMMARY.md](IMPLEMENTATION_SUMMARY.md)** - Resumo de implementações realizadas
+
 ## 👥 Comunidade & Contribuições
 
 - **[CONTRIBUTING.md](CONTRIBUTING.md)** - Diretrizes para contribuir

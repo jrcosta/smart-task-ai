@@ -82,12 +82,26 @@ cp .env.example .env
 
 3. Execute com Docker Compose:
 ```bash
-docker-compose up -d
+docker-compose -f infrastructure/docker-compose.yml up -d
 ```
 
 4. Acesse a aplicação:
 - Frontend: http://localhost:3000
 - Backend API: http://localhost:8080/api
+
+### Opção 1b: Com Docker + Observabilidade (Prometheus, Grafana, Jaeger)
+
+```bash
+# Inicie o stack de observabilidade
+docker-compose -f infrastructure/docker-compose-observability.yml up -d
+
+# Acesse:
+# - Prometheus: http://localhost:9090
+# - Grafana: http://localhost:3000
+# - Jaeger UI: http://localhost:16686
+```
+
+**Documentação**: Veja [`docs/OBSERVABILITY.md`](docs/OBSERVABILITY.md) para configuração completa.
 
 ### Opção 2: Execução Local
 
@@ -153,6 +167,29 @@ Para receber notificações no WhatsApp:
 5. Acesse a página de Notificações no app e configure seu número
 
 **Guia completo**: Veja o arquivo [WHATSAPP_SETUP.md](docs/WHATSAPP_SETUP.md) para instruções detalhadas.
+
+## 📊 Observabilidade & Monitoramento
+
+Este projeto inclui observabilidade completa com **OpenTelemetry**, **Prometheus**, **Grafana** e **Jaeger**:
+
+- 📈 **Métricas**: Monitoradas pelo Prometheus
+- 📊 **Dashboards**: Visualizadas no Grafana
+- 🔍 **Traces**: Rastreamento distribuído com Jaeger
+- 📝 **Logs**: Estruturados e correlacionados com traces
+
+### Iniciar Stack de Observabilidade
+
+```bash
+docker-compose -f infrastructure/docker-compose-observability.yml up -d
+```
+
+### Acessar Ferramentas
+
+- **Prometheus**: http://localhost:9090 - Métricas e alertas
+- **Grafana**: http://localhost:3000 - Dashboards personalizados
+- **Jaeger UI**: http://localhost:16686 - Tracing distribuído
+
+**Documentação completa**: Veja [`docs/OBSERVABILITY.md`](docs/OBSERVABILITY.md) para configuração e uso.
 
 ## � Documentação do Projeto
 
@@ -275,30 +312,42 @@ Content-Type: application/json
 ## 🏗️ Arquitetura
 
 ```
-smart-task-manager/
-├── backend/                 # API Spring Boot
+smart-task-ai/
+├── backend/                        # API Spring Boot com OpenTelemetry
 │   ├── src/main/java/
 │   │   └── com/smarttask/
-│   │       ├── config/      # Configurações (Security, etc)
-│   │       ├── controller/  # Controllers REST
-│   │       ├── dto/         # Data Transfer Objects
-│   │       ├── exception/   # Exception handlers
-│   │       ├── model/       # Entidades JPA
-│   │       ├── repository/  # Repositórios
-│   │       ├── security/    # JWT e autenticação
-│   │       └── service/     # Lógica de negócio
+│   │       ├── config/             # Configurações (Security, OpenTelemetry)
+│   │       ├── controller/         # Controllers REST
+│   │       ├── dto/                # Data Transfer Objects
+│   │       ├── exception/          # Exception handlers
+│   │       ├── model/              # Entidades JPA
+│   │       ├── repository/         # Repositórios
+│   │       ├── security/           # JWT e autenticação
+│   │       └── service/            # Lógica de negócio
 │   └── pom.xml
 │
-├── frontend/                # Aplicação React
+├── frontend/                       # Aplicação React com TypeScript
 │   ├── src/
-│   │   ├── components/      # Componentes reutilizáveis
-│   │   ├── pages/           # Páginas da aplicação
-│   │   ├── store/           # Estado global (Zustand)
-│   │   ├── lib/             # Utilitários e API client
-│   │   └── types/           # Tipos TypeScript
+│   │   ├── components/             # Componentes reutilizáveis
+│   │   ├── pages/                  # Páginas da aplicação
+│   │   ├── store/                  # Estado global (Zustand)
+│   │   ├── lib/                    # Utilitários e API client
+│   │   └── types/                  # Tipos TypeScript
 │   └── package.json
 │
-└── docker-compose.yml       # Orquestração de containers
+├── infrastructure/                 # 🐳 Docker & Observabilidade
+│   ├── docker-compose.yml          # Produção (Backend + Frontend + DB)
+│   ├── docker-compose-observability.yml  # Stack de observabilidade
+│   └── README.md                   # Guia de uso
+│
+├── observability/                  # 📊 Configs Prometheus, Grafana, Jaeger
+│   ├── prometheus/
+│   ├── grafana/
+│   └── jaeger/
+│
+├── docs/                           # 📖 Documentação
+├── scripts/                        # 🔧 Scripts de inicialização
+└── README.md                       # Este arquivo
 ```
 
 ## 🤝 Contribuindo
