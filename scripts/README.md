@@ -72,6 +72,66 @@ Scripts utilitários para iniciar o backend e frontend da aplicação.
 
 ---
 
+### 📚 Scripts de Documentação JavaDoc
+
+#### `RUN-JAVADOC.bat` (Windows - Recomendado)
+**Descrição**: Script simples para gerar documentação JavaDoc (duplo-clique).
+
+```bash
+# Duplo-clique em:
+RUN-JAVADOC.bat
+
+# Ou via linha de comando:
+cmd /c RUN-JAVADOC.bat
+```
+
+**Funcionalidades**:
+- ✅ Verifica Maven
+- ✅ Compila projeto
+- ✅ Gera documentação JavaDoc
+- ✅ Abre navegador automaticamente com resultado
+
+**Resultado**: `backend/target/site/apidocs/index.html`
+
+---
+
+#### `generate-javadoc.bat` (Windows - Alternativo)
+**Descrição**: Script batch alternativo para gerar JavaDoc.
+
+```bash
+generate-javadoc.bat
+```
+
+---
+
+#### `generate-javadoc.ps1` (PowerShell - Alternativo)
+**Descrição**: Script PowerShell para gerar JavaDoc com Maven.
+
+```bash
+powershell -ExecutionPolicy Bypass -File .\generate-javadoc.ps1
+```
+
+---
+
+## 🚀 Uso em Diferentes Plataformas
+
+### Windows (Recomendado)
+```bash
+# Para gerar JavaDoc:
+scripts/RUN-JAVADOC.bat
+
+# Ou duplo-clique em RUN-JAVADOC.bat na pasta scripts/
+```
+
+### Linux/macOS
+```bash
+# Para gerar JavaDoc via Maven:
+cd backend
+mvn javadoc:aggregate
+```
+
+---
+
 ## 🐧 Uso no WSL
 
 Se você estiver usando WSL e encontrar erro "cannot execute: required file not found", execute os scripts assim:
@@ -80,6 +140,7 @@ Se você estiver usando WSL e encontrar erro "cannot execute: required file not 
 bash scripts/start-backend-with-env.sh
 bash scripts/start-backend.sh
 bash scripts/start-frontend.sh
+bash scripts/validate-observability.sh
 ```
 
 Ou, para resolver permanentemente, execute dentro do WSL:

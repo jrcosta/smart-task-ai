@@ -230,13 +230,19 @@ Após iniciar o backend (`mvn spring-boot:run` ou Docker), acesse:
 
 A documentação completa do código-fonte Java (JavaDoc) pode ser gerada e visualizada:
 
-**Gerar documentação:**
+**Gerar documentação (Forma Rápida - Windows):**
+```bash
+# Duplo-clique em:
+scripts/RUN-JAVADOC.bat
+```
+
+**Gerar documentação (Alternativas):**
 ```bash
 # Windows (PowerShell)
-.\generate-javadoc.ps1
+scripts/generate-javadoc.ps1
 
 # Windows (Batch)
-generate-javadoc.bat
+scripts/generate-javadoc.bat
 
 # Linux/macOS
 cd backend
@@ -252,8 +258,9 @@ docker run -v $(pwd)/docs/javadoc:/app/docs smart-task-javadoc
 ```
 
 **Referência rápida:**
-- [Guia de Geração JavaDoc](docs/javadoc/README.md)
-- [Índice de Classes](docs/javadoc/INDEX.md)
+- [Guia de Geração JavaDoc](docs/JAVADOC_README.md)
+- [Relatório de Sucesso](docs/JAVADOC_GENERATION_SUCCESS.md)
+- [Índice de Classes JavaDoc](docs/javadoc/INDEX.md)
 - [Referência Completa](docs/javadoc/CLASSES.md)
 
 ### 🧪 Testar Endpoints

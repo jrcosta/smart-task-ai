@@ -154,18 +154,34 @@ Para receber notificações no WhatsApp:
 
 **Guia completo**: Veja o arquivo [WHATSAPP_SETUP.md](WHATSAPP_SETUP.md) para instruções detalhadas.
 
-## � Documentação do Projeto
+## 📖 Documentação do Projeto
 
 A base de código possui geração automática de documentação tanto para o backend (Java) quanto para o frontend (TypeScript).
 
 ### Backend (Javadoc)
 
+#### Forma Rápida (Windows)
+```bash
+# Duplo-clique em:
+scripts/RUN-JAVADOC.bat
+
+# Ou executar via comando:
+cmd /c scripts/RUN-JAVADOC.bat
+```
+
+#### Via Maven (Qualquer plataforma)
 ```bash
 cd backend
 mvn javadoc:aggregate
 ```
 
 O conteúdo HTML será exportado para `backend/target/site/apidocs/index.html`.
+
+**Documentação de Referência:**
+- [JAVADOC_README.md](JAVADOC_README.md) - Como gerar documentação
+- [JAVADOC_GENERATION_SUCCESS.md](JAVADOC_GENERATION_SUCCESS.md) - Relatório de sucesso
+- [javadoc/INDEX.md](javadoc/INDEX.md) - Índice de classes
+- [javadoc/CLASSES.md](javadoc/CLASSES.md) - Referência completa
 
 ### Frontend (TypeDoc)
 
