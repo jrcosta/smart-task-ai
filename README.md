@@ -36,7 +36,7 @@ Um gerenciador de tarefas inteligente com integração de IA, desenvolvido com *
 ## 🛠️ Tecnologias
 
 ### Backend
-- **Java 17**
+- **Java 25**
 - **Spring Boot 3.2** (Web, Data JPA, Security, Scheduling)
 - **Spring Security** com JWT
 - **PostgreSQL** / H2 (desenvolvimento)
@@ -46,7 +46,7 @@ Um gerenciador de tarefas inteligente com integração de IA, desenvolvido com *
 - **Lombok**
 
 ### Frontend
-- **React 18** com TypeScript
+- **React 19** com TypeScript
 - **Vite** (build tool)
 - **TailwindCSS** (estilização)
 - **React Router** (navegação)
