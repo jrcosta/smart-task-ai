@@ -1,4 +1,6 @@
-#!/bin/bash
+#!/usr/bin/env bash
+set -euo pipefail
+IFS=$'\n\t'
 
 echo "🚀 Iniciando Smart Task Manager Backend com variáveis de ambiente..."
 echo ""
@@ -28,8 +30,11 @@ echo "📋 Parando processos anteriores..."
 pkill -9 -f "spring-boot:run" 2>/dev/null || true
 sleep 2
 
-# Carregar SDKMAN
-source ~/.sdkman/bin/sdkman-init.sh
+# Carregar SDKMAN (se existir)
+if [ -s "$HOME/.sdkman/bin/sdkman-init.sh" ]; then
+    # shellcheck source=/dev/null
+    source "$HOME/.sdkman/bin/sdkman-init.sh"
+fi
 
 # Iniciar o backend com as variáveis de ambiente
 echo "🚀 Iniciando backend..."
