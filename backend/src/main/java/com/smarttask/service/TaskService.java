@@ -23,18 +23,56 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * Gerencia o ciclo de vida das tarefas, incluindo criação com IA, atualização,
- * exclusão e consultas filtradas.
+ * Serviço responsável pela lógica de negócio de tarefas no sistema.
+ * 
+ * <p>Este serviço gerencia o ciclo de vida completo das tarefas, incluindo:</p>
+ * <ul>
+ *   <li>Criação de tarefas com análise opcional de IA</li>
+ *   <li>Atualização de status, prioridade e detalhes</li>
+ *   <li>Exclusão e exclusão em cascata de subtarefas</li>
+ *   <li>Consultas filtradas por usuário, status e prioridade</li>
+ *   <li>Integração com {@link AIService} para análise inteligente</li>
+ *   <li>Rastreamento de métricas via {@link MetricsService}</li>
+ * </ul>
+ * 
+ * <p>Todos os métodos públicos utilizam a anotação {@link Traced} para observabilidade
+ * automática via OpenTelemetry.</p>
+ * 
+ * @author Smart Task AI Team
+ * @version 1.0
+ * @since 2025-10
+ * @see Task
+ * @see AIService
+ * @see MetricsService
  */
 @Service
 @RequiredArgsConstructor
 public class TaskService {
 
+    /** Repositório para acesso a dados de tarefas */
     private final TaskRepository taskRepository;
+    
+    /** Repositório para acesso a dados de usuários */
     private final UserRepository userRepository;
+    
+    /** Serviço de IA para análise de tarefas */
     private final AIService aiService;
+    
+    /** Serviço para registrar métricas customizadas */
     private final MetricsService metricsService;
 
+    /**
+     * Cria uma nova tarefa para o usuário autenticado.
+     * 
+     * <p>Se a requisição indicar {@code analyzeWithAI = true}, a tarefa será
+     * enviada para análise pela IA, que fornecerá sugestões de prioridade,
+     * tags e subtarefas.</p>
+     * 
+     * @param request DTO com dados da tarefa (título, descrição, prioridade, etc.)
+     * @param currentUser Principal do usuário autenticado
+     * @return {@link TaskResponse} com os dados da tarefa criada
+     * @throws ResourceNotFoundException se o usuário não existir
+     */
     @Transactional
     @Traced(value = "TaskService.createTask", captureParameters = true)
     public TaskResponse createTask(TaskRequest request, UserPrincipal currentUser) {
