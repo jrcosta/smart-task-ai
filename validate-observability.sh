@@ -1,6 +1,6 @@
 #!/bin/bash
-
 # Script para validar a stack de observabilidade
+# Não usa 'set -e' pois queremos capturar falhas individuais sem parar o script
 
 echo "🔍 Validando Stack de Observabilidade do Smart Task Manager"
 echo "=========================================================="
@@ -20,7 +20,8 @@ test_endpoint() {
     
     echo -n "Testando $name... "
     
-    response=$(curl -s -o /dev/null -w "%{http_code}" "$url" 2>/dev/null)
+    # Adicionar timeout para evitar travamento
+    response=$(curl -s -o /dev/null -w "%{http_code}" --max-time 10 --connect-timeout 5 "$url" 2>/dev/null || echo "000")
     
     if [ "$response" == "$expected" ]; then
         echo -e "${GREEN}✓ OK${NC} (HTTP $response)"
@@ -34,37 +35,70 @@ test_endpoint() {
 # Contador de sucessos
 success=0
 total=0
+failed_tests=()
 
 # Testar Backend
 echo "📦 Backend API"
 ((total++))
-test_endpoint "  Health Check" "http://localhost:8080/api/actuator/health" "200" && ((success++))
+if test_endpoint "  Health Check" "http://localhost:8080/api/actuator/health" "200"; then
+    ((success++))
+else
+    failed_tests+=("Backend Health Check")
+fi
 ((total++))
-test_endpoint "  Prometheus Metrics" "http://localhost:8080/api/actuator/prometheus" "200" && ((success++))
+if test_endpoint "  Prometheus Metrics" "http://localhost:8080/api/actuator/prometheus" "200"; then
+    ((success++))
+else
+    failed_tests+=("Backend Prometheus Metrics")
+fi
 echo ""
 
 # Testar Jaeger
 echo "📊 Jaeger (Traces)"
 ((total++))
-test_endpoint "  Jaeger UI" "http://localhost:16686/" "200" && ((success++))
+if test_endpoint "  Jaeger UI" "http://localhost:16686/" "200"; then
+    ((success++))
+else
+    failed_tests+=("Jaeger UI")
+fi
 ((total++))
-test_endpoint "  Jaeger API" "http://localhost:16686/api/services" "200" && ((success++))
+if test_endpoint "  Jaeger API" "http://localhost:16686/api/services" "200"; then
+    ((success++))
+else
+    failed_tests+=("Jaeger API")
+fi
 echo ""
 
 # Testar Prometheus
 echo "📈 Prometheus (Metrics)"
 ((total++))
-test_endpoint "  Prometheus UI" "http://localhost:9090/" "200" && ((success++))
+if test_endpoint "  Prometheus UI" "http://localhost:9090/" "200"; then
+    ((success++))
+else
+    failed_tests+=("Prometheus UI")
+fi
 ((total++))
-test_endpoint "  Prometheus API" "http://localhost:9090/api/v1/status/config" "200" && ((success++))
+if test_endpoint "  Prometheus API" "http://localhost:9090/api/v1/status/config" "200"; then
+    ((success++))
+else
+    failed_tests+=("Prometheus API")
+fi
 echo ""
 
 # Testar Grafana
 echo "📉 Grafana (Dashboard)"
 ((total++))
-test_endpoint "  Grafana UI" "http://localhost:3001/" "302" && ((success++))
+if test_endpoint "  Grafana UI" "http://localhost:3001/" "302"; then
+    ((success++))
+else
+    failed_tests+=("Grafana UI")
+fi
 ((total++))
-test_endpoint "  Grafana API" "http://localhost:3001/api/health" "200" && ((success++))
+if test_endpoint "  Grafana API" "http://localhost:3001/api/health" "200"; then
+    ((success++))
+else
+    failed_tests+=("Grafana API")
+fi
 echo ""
 
 # Resultado final
@@ -84,10 +118,20 @@ if [ $success -eq $total ]; then
 else
     echo -e "${RED}❌ Alguns serviços falharam! ($success/$total)${NC}"
     echo ""
+    if [ ${#failed_tests[@]} -gt 0 ]; then
+        echo "Testes que falharam:"
+        for test in "${failed_tests[@]}"; do
+            echo "  - $test"
+        done
+        echo ""
+    fi
     echo "Verifique os logs com:"
     echo "  docker-compose logs -f"
     echo ""
     echo "Ou reinicie os serviços:"
     echo "  docker-compose restart"
+    echo ""
+    echo "Ou inicie os serviços se ainda não estiverem rodando:"
+    echo "  docker-compose up -d"
     exit 1
 fi
