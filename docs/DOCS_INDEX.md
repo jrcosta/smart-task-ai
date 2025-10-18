@@ -10,6 +10,7 @@ Bem-vindo à documentação do Smart Task Manager! Navegue pelos documentos abai
 ## 🖥️ Backend & Execução
 
 - **[START_BACKEND.md](START_BACKEND.md)** - Como iniciar o backend
+- **[API_DOCUMENTATION.md](API_DOCUMENTATION.md)** - Documentação interativa com Swagger/OpenAPI
 - **[../scripts/README.md](../scripts/README.md)** - Documentação dos scripts de inicialização
 
 ## 📱 Features Especiais
@@ -67,6 +68,7 @@ docs/
 |---------|----------|
 | "Como começo?" | [QUICKSTART.md](QUICKSTART.md) |
 | "Como configuro tudo?" | [SETUP.md](SETUP.md) |
+| "Como uso a API?" | [API_DOCUMENTATION.md](API_DOCUMENTATION.md) |
 | "Como uso WhatsApp?" | [WHATSAPP_SETUP.md](WHATSAPP_SETUP.md) |
 | "Como contribúo?" | [CONTRIBUTING.md](CONTRIBUTING.md) |
 | "Qual é o histórico?" | [CHANGELOG.md](CHANGELOG.md) |
