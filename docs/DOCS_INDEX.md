@@ -41,7 +41,7 @@ Bem-vindo à documentação do Smart Task Manager! Navegue pelos documentos abai
 ## 🔗 Links Principais
 
 - **[README Principal](../README.md)** - Visão geral completa do projeto
-- **[INDEX do Projeto](../INDEX.md)** - Navegação geral de toda a estrutura
+- **[INDEX do Projeto](INDEX.md)** - Navegação geral de toda a estrutura
 - **[GitHub](https://github.com/jrcosta/smart-task-ai)** - Repositório
 - **[Scripts](../scripts/)** - Ferramentas de inicialização
 

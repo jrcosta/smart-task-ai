@@ -312,21 +312,21 @@ Contribuições são bem-vindas! Sinta-se à vontade para:
 - 💬 **Discutir Ideias**: Participe das [discussions](https://github.com/jrcosta/smart-task-ai/discussions)
 - 📝 **Melhorar Documentação**: PRs de docs são bem-vindas
 - 🧪 **Adicionar Testes**: Aumentar cobertura é muito apreciado
-- 🔧 **Implementar Features**: Veja o [ROADMAP.md](ROADMAP.md)
+- 🔧 **Implementar Features**: Veja o [ROADMAP.md](docs/ROADMAP.md)
 
 ### 📋 Código de Conduta
 
-Este projeto adota o [Código de Conduta](CODE_OF_CONDUCT.md). Esperamos que todos os contribuidores sigam estas diretrizes.
+Este projeto adota o [Código de Conduta](docs/CODE_OF_CONDUCT.md). Esperamos que todos os contribuidores sigam estas diretrizes.
 
 ### 🔒 Segurança
 
-Se encontrou uma vulnerabilidade de segurança, **não abra uma issue pública**. Veja [SECURITY.md](SECURITY.md) para instruções de divulgação responsável.
+Se encontrou uma vulnerabilidade de segurança, **não abra uma issue pública**. Veja [SECURITY.md](docs/SECURITY.md) para instruções de divulgação responsável.
 
 ### 📚 Recursos para Contribuidores
 
 - [Guia de Contribuição](docs/CONTRIBUTING.md) - Como começar
 - [Instruções para Copilot/Agentes](docs/.github/copilot-instructions.md) - Para desenvolvimento com IA
-- [Roadmap](ROADMAP.md) - Funcionalidades planejadas
+- [Roadmap](docs/ROADMAP.md) - Funcionalidades planejadas
 - [Documentação da API](docs/API_DOCUMENTATION.md) - Swagger interativo
 
 ## 📝 Melhorias Futuras
