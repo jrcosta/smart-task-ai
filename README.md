@@ -226,6 +226,36 @@ Após iniciar o backend (`mvn spring-boot:run` ou Docker), acesse:
 - **OpenAPI JSON**: http://localhost:8080/api/docs
 - **OpenAPI YAML**: http://localhost:8080/api/docs.yaml
 
+### 📖 Documentação JavaDoc
+
+A documentação completa do código-fonte Java (JavaDoc) pode ser gerada e visualizada:
+
+**Gerar documentação:**
+```bash
+# Windows (PowerShell)
+.\generate-javadoc.ps1
+
+# Windows (Batch)
+generate-javadoc.bat
+
+# Linux/macOS
+cd backend
+mvn clean javadoc:aggregate
+```
+
+**Visualizar:** Abra `backend/target/site/apidocs/index.html` no navegador
+
+**Documentação com Docker:**
+```bash
+docker build -f docs/javadoc/Dockerfile -t smart-task-javadoc .
+docker run -v $(pwd)/docs/javadoc:/app/docs smart-task-javadoc
+```
+
+**Referência rápida:**
+- [Guia de Geração JavaDoc](docs/javadoc/README.md)
+- [Índice de Classes](docs/javadoc/INDEX.md)
+- [Referência Completa](docs/javadoc/CLASSES.md)
+
 ### 🧪 Testar Endpoints
 
 No Swagger UI você pode:

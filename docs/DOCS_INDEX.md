@@ -11,6 +11,7 @@ Bem-vindo à documentação do Smart Task Manager! Navegue pelos documentos abai
 
 - **[START_BACKEND.md](START_BACKEND.md)** - Como iniciar o backend
 - **[API_DOCUMENTATION.md](API_DOCUMENTATION.md)** - Documentação interativa com Swagger/OpenAPI
+- **[javadoc/](javadoc/)** - Documentação JavaDoc completa das classes
 - **[../scripts/README.md](../scripts/README.md)** - Documentação dos scripts de inicialização
 
 ## 📱 Features Especiais
@@ -59,7 +60,12 @@ docs/
 ├── AGENTS.md                      # Agents & IA
 ├── SECURITY_IMPROVEMENTS.md       # Segurança
 ├── CONTRIBUTING.md                # Contribuições
-└── CHANGELOG.md                   # Histórico
+├── CHANGELOG.md                   # Histórico
+└── javadoc/                       # 📚 Documentação JavaDoc
+    ├── README.md                  # Guia de geração
+    ├── INDEX.md                   # Índice de classes
+    ├── CLASSES.md                 # Referência completa
+    ├── Dockerfile                 # Para gerar com Docker
 ```
 
 ## ❓ Precisa de Ajuda?
@@ -69,6 +75,8 @@ docs/
 | "Como começo?" | [QUICKSTART.md](QUICKSTART.md) |
 | "Como configuro tudo?" | [SETUP.md](SETUP.md) |
 | "Como uso a API?" | [API_DOCUMENTATION.md](API_DOCUMENTATION.md) |
+| "Qual é a estrutura do código?" | [javadoc/CLASSES.md](javadoc/CLASSES.md) |
+| "Como gero documentação?" | [javadoc/README.md](javadoc/README.md) |
 | "Como uso WhatsApp?" | [WHATSAPP_SETUP.md](WHATSAPP_SETUP.md) |
 | "Como contribúo?" | [CONTRIBUTING.md](CONTRIBUTING.md) |
 | "Qual é o histórico?" | [CHANGELOG.md](CHANGELOG.md) |
