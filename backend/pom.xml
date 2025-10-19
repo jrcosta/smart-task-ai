@@ -19,9 +19,9 @@
     <description>Gerenciador de tarefas inteligente com IA</description>
     
     <properties>
-        <java.version>25</java.version>
-        <maven.compiler.source>25</maven.compiler.source>
-        <maven.compiler.target>25</maven.compiler.target>
+        <java.version>17</java.version>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
         <lombok.version>1.18.40</lombok.version>
         <opentelemetry.version>1.32.0</opentelemetry.version>
         <opentelemetry-instrumentation.version>1.32.0</opentelemetry-instrumentation.version>
@@ -186,7 +186,7 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.13.0</version>
                 <configuration>
-                    <release>25</release>
+                    <release>17</release>
                     <annotationProcessorPaths>
                         <path>
                             <groupId>org.projectlombok</groupId>

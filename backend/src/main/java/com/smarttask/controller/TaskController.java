@@ -41,6 +41,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/tasks")
+@RequiredArgsConstructor
 public class TaskController {
 
     /** Serviço de negócio para tarefas */

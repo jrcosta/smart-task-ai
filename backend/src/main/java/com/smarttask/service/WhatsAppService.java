@@ -6,6 +6,7 @@ import com.smarttask.observability.Traced;
 import com.twilio.Twilio;
 import com.twilio.rest.api.v2010.account.Message;
 import com.twilio.type.PhoneNumber;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -21,44 +22,50 @@ import java.util.List;
  */
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class WhatsAppService {
 
     @Value("${twilio.account-sid:}")
-    private String accountSid;
+    private String defaultAccountSid;
 
     @Value("${twilio.auth-token:}")
-    private String authToken;
+    private String defaultAuthToken;
 
     @Value("${twilio.whatsapp-number:}")
-    private String twilioWhatsAppNumber;
+    private String defaultTwilioWhatsAppNumber;
 
-    private boolean twilioConfigured = false;
+    private boolean defaultTwilioConfigured = false;
     
     private final MetricsService metricsService;
-    
-    public WhatsAppService(MetricsService metricsService) {
-        this.metricsService = metricsService;
-    }
+    private final SettingsService settingsService;
 
     @PostConstruct
     public void init() {
-        if (accountSid != null && !accountSid.isEmpty() && 
-            authToken != null && !authToken.isEmpty()) {
+        if (defaultAccountSid != null && !defaultAccountSid.isEmpty() && 
+            defaultAuthToken != null && !defaultAuthToken.isEmpty()) {
             try {
-                Twilio.init(accountSid, authToken);
-                twilioConfigured = true;
-                log.info("Twilio WhatsApp service initialized successfully");
+                Twilio.init(defaultAccountSid, defaultAuthToken);
+                defaultTwilioConfigured = true;
+                log.info("Default Twilio WhatsApp service initialized successfully");
             } catch (Exception e) {
-                log.warn("Failed to initialize Twilio: {}", e.getMessage());
-                twilioConfigured = false;
+                log.warn("Failed to initialize default Twilio: {}", e.getMessage());
+                defaultTwilioConfigured = false;
             }
         } else {
-            log.warn("Twilio credentials not configured. WhatsApp notifications will be simulated.");
+            log.info("No default Twilio credentials configured. Using user-specific credentials.");
         }
     }
 
     @Traced("WhatsAppService.sendDailyTaskReminder")
-    public void sendDailyTaskReminder(String toNumber, String userName, List<Task> tasks) {
+    public void sendDailyTaskReminder(Long userId, String userName, List<Task> tasks) {
+        SettingsService.TwilioCredentials creds = settingsService.getDecryptedTwilioCredentials(userId);
+        String toNumber = creds.userWhatsappNumber;
+        
+        if (!StringUtils.hasText(toNumber)) {
+            log.warn("Usuário {} não tem número WhatsApp configurado. Mensagem não enviada.", userId);
+            return;
+        }
+        
         StringBuilder message = new StringBuilder();
         message.append("🌅 *Bom dia, ").append(userName).append("!*\n\n");
         message.append("📋 *Suas tarefas para hoje:*\n\n");
@@ -103,12 +110,20 @@ public class WhatsAppService {
             message.append("💪 Você consegue! Boa sorte!");
         }
 
-        sendMessage(toNumber, message.toString(), "daily_reminder");
+        sendMessage(userId, toNumber, message.toString(), "daily_reminder");
     }
 
     @Traced("WhatsAppService.sendOverdueAlert")
-    public void sendOverdueAlert(String toNumber, String userName, List<Task> overdueTasks) {
+    public void sendOverdueAlert(Long userId, String userName, List<Task> overdueTasks) {
         if (overdueTasks.isEmpty()) {
+            return;
+        }
+
+        SettingsService.TwilioCredentials creds = settingsService.getDecryptedTwilioCredentials(userId);
+        String toNumber = creds.userWhatsappNumber;
+        
+        if (!StringUtils.hasText(toNumber)) {
+            log.warn("Usuário {} não tem número WhatsApp configurado. Mensagem não enviada.", userId);
             return;
         }
 
@@ -128,11 +143,19 @@ public class WhatsAppService {
 
         message.append("\n🚀 Que tal resolver essas tarefas hoje?");
 
-        sendMessage(toNumber, message.toString(), "overdue_alert");
+        sendMessage(userId, toNumber, message.toString(), "overdue_alert");
     }
 
     @Traced("WhatsAppService.sendCompletionSummary")
-    public void sendCompletionSummary(String toNumber, String userName, int completedToday, int totalHours) {
+    public void sendCompletionSummary(Long userId, String userName, int completedToday, int totalHours) {
+        SettingsService.TwilioCredentials creds = settingsService.getDecryptedTwilioCredentials(userId);
+        String toNumber = creds.userWhatsappNumber;
+        
+        if (!StringUtils.hasText(toNumber)) {
+            log.warn("Usuário {} não tem número WhatsApp configurado. Mensagem não enviada.", userId);
+            return;
+        }
+        
         StringBuilder message = new StringBuilder();
         message.append("🎉 *Parabéns, ").append(userName).append("!*\n\n");
         message.append("Você completou *").append(completedToday).append(" tarefa(s)* hoje!\n");
@@ -143,11 +166,19 @@ public class WhatsAppService {
         
         message.append("\n✨ Continue assim! Você está indo muito bem! 💪");
 
-        sendMessage(toNumber, message.toString(), "completion_summary");
+        sendMessage(userId, toNumber, message.toString(), "completion_summary");
     }
 
     @Traced("WhatsAppService.sendTestMessage")
-    public void sendTestMessage(String toNumber, String userName) {
+    public void sendTestMessage(Long userId, String userName) {
+        SettingsService.TwilioCredentials creds = settingsService.getDecryptedTwilioCredentials(userId);
+        String toNumber = creds.userWhatsappNumber;
+        
+        if (!StringUtils.hasText(toNumber)) {
+            log.warn("Usuário {} não tem número WhatsApp configurado. Mensagem de teste não enviada.", userId);
+            return;
+        }
+        
         String message = String.format(
             "🤖 *Olá, %s!*\n\n" +
             "Este é um teste de notificação do *Smart Task Manager*.\n\n" +
@@ -156,16 +187,35 @@ public class WhatsAppService {
             userName
         );
 
-        sendMessage(toNumber, message, "test_message");
+        sendMessage(userId, toNumber, message, "test_message");
     }
 
-    private void sendMessage(String toNumber, String messageBody, String messageType) {
+    private void sendMessage(Long userId, String toNumber, String messageBody, String messageType) {
         if (!StringUtils.hasText(toNumber)) {
             log.warn("Tentativa de envio de WhatsApp sem número de destino. Mensagem descartada.");
             return;
         }
 
         String sanitizedTo = toNumber.trim();
+        
+        // Obtém as credenciais do usuário
+        SettingsService.TwilioCredentials creds = settingsService.getDecryptedTwilioCredentials(userId);
+        
+        // Se o usuário não tem credenciais configuradas, tenta usar as padrão
+        boolean twilioConfigured = false;
+        String accountSid = creds.accountSid;
+        String authToken = creds.authToken;
+        String twilioWhatsAppNumber = creds.whatsappNumber;
+        
+        if (accountSid == null || accountSid.isEmpty() || authToken == null || authToken.isEmpty()) {
+            // Fallback para credenciais padrão
+            accountSid = defaultAccountSid;
+            authToken = defaultAuthToken;
+            twilioWhatsAppNumber = defaultTwilioWhatsAppNumber;
+            twilioConfigured = defaultTwilioConfigured;
+        } else {
+            twilioConfigured = true;
+        }
 
         if (!twilioConfigured) {
             log.info("📱 [SIMULAÇÃO] Mensagem WhatsApp para {}: \n{}", sanitizedTo, messageBody);
@@ -181,6 +231,9 @@ public class WhatsAppService {
         }
 
         try {
+            // Inicializa Twilio com as credenciais específicas do usuário
+            Twilio.init(accountSid, authToken);
+            
             // Garantir formato WhatsApp (whatsapp:+número)
             String formattedTo = sanitizedTo.startsWith("whatsapp:") ? sanitizedTo : "whatsapp:" + sanitizedTo;
             String formattedFrom = twilioWhatsAppNumber.startsWith("whatsapp:") ? 
