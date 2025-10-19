@@ -8,6 +8,7 @@ import com.smarttask.observability.Traced;
 import com.theokanning.openai.completion.chat.ChatCompletionRequest;
 import com.theokanning.openai.completion.chat.ChatMessage;
 import com.theokanning.openai.service.OpenAiService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -26,10 +27,11 @@ import java.util.stream.Collectors;
  */
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class AIService {
 
-    @Value("${openai.api-key}")
-    private String apiKey;
+    @Value("${openai.api-key:}")
+    private String defaultApiKey;
 
     @Value("${openai.model}")
     private String model;
@@ -38,19 +40,22 @@ public class AIService {
     private Integer maxTokens;
     
     private final MetricsService metricsService;
-    
-    public AIService(MetricsService metricsService) {
-        this.metricsService = metricsService;
-    }
+    private final SettingsService settingsService;
 
     @Traced(value = "AIService.analyzeTask", captureParameters = true)
-    public AIAnalysisResponse analyzeTask(AIAnalysisRequest request) {
+    public AIAnalysisResponse analyzeTask(AIAnalysisRequest request, Long userId) {
         long startTime = System.currentTimeMillis();
         boolean success = false;
         
         try {
-            // Verifica se a API key está configurada
-            if (apiKey == null || apiKey.equals("your-api-key-here")) {
+            // Obtém a chave do usuário ou usa a padrão
+            String apiKey = settingsService.getDecryptedOpenAIKey(userId);
+            if (apiKey == null || apiKey.isEmpty()) {
+                apiKey = defaultApiKey;
+            }
+            
+            // Verifica se alguma API key está configurada
+            if (apiKey == null || apiKey.isEmpty() || apiKey.equals("your-api-key-here")) {
                 return createMockAnalysis(request.getText());
             }
 
@@ -213,9 +218,15 @@ public class AIService {
         return response;
     }
 
-    public String generateProductivityReport(List<String> completedTasks, int totalHours) {
+    public String generateProductivityReport(List<String> completedTasks, int totalHours, Long userId) {
         try {
-            if (apiKey == null || apiKey.equals("your-api-key-here")) {
+            // Obtém a chave do usuário ou usa a padrão
+            String apiKey = settingsService.getDecryptedOpenAIKey(userId);
+            if (apiKey == null || apiKey.isEmpty()) {
+                apiKey = defaultApiKey;
+            }
+            
+            if (apiKey == null || apiKey.isEmpty() || apiKey.equals("your-api-key-here")) {
                 return generateMockReport(completedTasks.size(), totalHours);
             }
 

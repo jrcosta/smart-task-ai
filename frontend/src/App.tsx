@@ -8,6 +8,7 @@ import Register from '@/pages/Register';
 import Dashboard from '@/pages/Dashboard';
 import Tasks from '@/pages/Tasks';
 import Notifications from '@/pages/Notifications';
+import Settings from '@/pages/Settings';
 
 /**
  * Instância compartilhada do React Query para gerenciamento de dados remotos na aplicação.
@@ -66,6 +67,14 @@ function App() {
             element={
               <PrivateRoute>
                 <Notifications />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/settings"
+            element={
+              <PrivateRoute>
+                <Settings />
               </PrivateRoute>
             }
           />

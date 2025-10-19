@@ -72,6 +72,26 @@ Um gerenciador de tarefas inteligente com integração de IA, desenvolvido com *
 
 **Para entender tudo**: Consulte [`docs/INDICE_DOCUMENTACAO.md`](docs/INDICE_DOCUMENTACAO.md) - índice central.
 
+### ⚡ Setup Rápido (Novo!)
+
+**Não precisa mais configurar variáveis de ambiente!** 🎉
+
+Agora você pode configurar suas chaves de API (OpenAI e Twilio) diretamente pela interface web:
+
+1. Clone e inicie com Docker:
+```bash
+git clone https://github.com/jrcosta/smart-task-ai.git
+cd smart-task-ai/infrastructure
+docker-compose -f docker-compose-unified.yml up -d
+```
+
+2. Acesse http://localhost:3000
+3. Faça login ou cadastre-se
+4. Vá em **Configurações** e configure suas chaves de API
+5. Pronto! Use IA e WhatsApp sem complicação 🚀
+
+📖 **Guia completo**: [`docs/CONFIGURACAO_CHAVES.md`](docs/CONFIGURACAO_CHAVES.md)
+
 ### 🚀 Opção 1: Com Docker (Recomendado - Mais Fácil)
 
 1. Clone o repositório:

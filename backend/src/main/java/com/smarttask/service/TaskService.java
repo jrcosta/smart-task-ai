@@ -115,7 +115,7 @@ public class TaskService {
         AIAnalysisRequest aiRequest = new AIAnalysisRequest();
         aiRequest.setText(request.getTitle() + " " + (request.getDescription() != null ? request.getDescription() : ""));
         
-        AIAnalysisResponse aiAnalysis = aiService.analyzeTask(aiRequest);
+        AIAnalysisResponse aiAnalysis = aiService.analyzeTask(aiRequest, currentUser.getId());
 
         User user = userRepository.findById(currentUser.getId())
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));

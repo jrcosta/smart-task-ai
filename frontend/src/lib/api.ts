@@ -10,6 +10,8 @@ import type {
   TaskRequest,
   AIAnalysisRequest,
   AIAnalysisResponse,
+  SettingsRequest,
+  SettingsResponse,
 } from '@/types';
 
 /**
@@ -117,6 +119,22 @@ export const tasksAPI = {
 export const aiAPI = {
   analyze: async (data: AIAnalysisRequest): Promise<AIAnalysisResponse> => {
     const response = await api.post<AIAnalysisResponse>('/ai/analyze', data);
+    return response.data;
+  },
+};
+
+// Settings API
+/**
+ * Serviço de gerenciamento de configurações do usuário.
+ */
+export const settingsAPI = {
+  get: async (): Promise<SettingsResponse> => {
+    const response = await api.get<SettingsResponse>('/settings');
+    return response.data;
+  },
+
+  update: async (data: SettingsRequest): Promise<SettingsResponse> => {
+    const response = await api.put<SettingsResponse>('/settings', data);
     return response.data;
   },
 };

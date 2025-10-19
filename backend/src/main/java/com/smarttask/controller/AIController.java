@@ -2,6 +2,7 @@ package com.smarttask.controller;
 
 import com.smarttask.dto.AIAnalysisRequest;
 import com.smarttask.dto.AIAnalysisResponse;
+import com.smarttask.security.JwtTokenProvider;
 import com.smarttask.service.AIService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -18,9 +19,21 @@ import org.springframework.web.bind.annotation.*;
 public class AIController {
 
     private final AIService aiService;
+    private final JwtTokenProvider jwtTokenProvider;
 
     @PostMapping("/analyze")
-    public ResponseEntity<AIAnalysisResponse> analyzeTask(@Valid @RequestBody AIAnalysisRequest request) {
-        return ResponseEntity.ok(aiService.analyzeTask(request));
+    public ResponseEntity<AIAnalysisResponse> analyzeTask(
+            @Valid @RequestBody AIAnalysisRequest request,
+            @RequestHeader("Authorization") String token) {
+        Long userId = getUserIdFromToken(token);
+        return ResponseEntity.ok(aiService.analyzeTask(request, userId));
+    }
+
+    /**
+     * Extrai o ID do usuário a partir do token JWT.
+     */
+    private Long getUserIdFromToken(String token) {
+        String jwt = token.replace("Bearer ", "");
+        return jwtTokenProvider.getUserIdFromToken(jwt);
     }
 }

@@ -86,12 +86,8 @@ public class NotificationService {
         NotificationPreference preference = preferenceRepository.findByUserId(currentUser.getId())
                 .orElseThrow(() -> new ResourceNotFoundException("Notification preferences not found"));
 
-        if (!StringUtils.hasText(preference.getWhatsappNumber())) {
-            throw new IllegalStateException("Número do WhatsApp não configurado para este usuário.");
-        }
-
         whatsAppService.sendTestMessage(
-            preference.getWhatsappNumber(),
+            currentUser.getId(),
             currentUser.getUsername()
         );
     }
@@ -136,14 +132,8 @@ public class NotificationService {
                 );
                 
                 if (!overdueTasks.isEmpty()) {
-                    if (!StringUtils.hasText(preference.getWhatsappNumber())) {
-                        log.warn("Usuário {} possui alertas habilitados, mas sem número de WhatsApp cadastrado.",
-                                preference.getUser().getId());
-                        continue;
-                    }
-
                     whatsAppService.sendOverdueAlert(
-                        preference.getWhatsappNumber(),
+                        preference.getUser().getId(),
                         preference.getUser().getUsername(),
                         overdueTasks
                     );
@@ -157,12 +147,6 @@ public class NotificationService {
 
     private void sendDailyReminder(NotificationPreference preference) {
         User user = preference.getUser();
-
-        if (!StringUtils.hasText(preference.getWhatsappNumber())) {
-            log.warn("Usuário {} possui lembretes diários agendados sem número de WhatsApp cadastrado.",
-                    user.getId());
-            return;
-        }
         
         // Buscar tarefas pendentes e em progresso
         List<Task> todoTasks = taskRepository.findByUserIdAndStatus(
@@ -186,7 +170,7 @@ public class NotificationService {
         });
         
         whatsAppService.sendDailyTaskReminder(
-            preference.getWhatsappNumber(),
+            user.getId(),
             user.getUsername(),
             todoTasks
         );

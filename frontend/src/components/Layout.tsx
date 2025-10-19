@@ -1,7 +1,7 @@
 import { ReactNode } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '@/store/authStore';
-import { LogOut, LayoutDashboard, ListTodo, Bell, Sparkles } from 'lucide-react';
+import { LogOut, LayoutDashboard, ListTodo, Bell, Sparkles, Settings } from 'lucide-react';
 
 /**
  * Propriedades aceitas pelo componente {@link Layout}.
@@ -57,6 +57,13 @@ export default function Layout({ children }: LayoutProps) {
                 >
                   <Bell className="w-4 h-4" />
                   <span>Notificações</span>
+                </Link>
+                <Link
+                  to="/settings"
+                  className="flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-primary-600 hover:bg-gray-50"
+                >
+                  <Settings className="w-4 h-4" />
+                  <span>Configurações</span>
                 </Link>
               </nav>
             </div>
