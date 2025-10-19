@@ -39,6 +39,7 @@ import java.util.List;
  * @see TaskRequest
  * @see TaskResponse
  */
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/tasks")
 public class TaskController {
