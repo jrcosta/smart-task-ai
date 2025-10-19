@@ -6,48 +6,79 @@ Configurações de infraestrutura, Docker Compose e ferramentas de observabilida
 
 ```
 infrastructure/
-├── docker-compose.yml              # Produção principal
-├── docker-compose-observability.yml # Stack de observabilidade (Prometheus, Grafana, Jaeger)
+├── docker-compose-unified.yml      # ✨ NOVO - Arquivo único unificado com Profiles
+├── docker-compose.yml              # (legado) Produção principal
+├── docker-compose-observability.yml # (legado) Stack de observabilidade
+├── docker-compose-menu.bat          # ✨ NOVO - Menu auxiliar (Windows)
+├── DOCKER_SETUP.md                 # ✨ NOVO - Documentação completa
 └── README.md                       # Este arquivo
 ```
 
-## 🚀 Docker Compose
+## 🎯 Recomendação (NOVO!)
 
-### Produção Principal
+**Use o arquivo `docker-compose-unified.yml` - é o melhor para estudo!**
 
-Inicie a aplicação completa com:
+### Por que usar o arquivo unificado?
+
+✅ Um único arquivo para todas as situações  
+✅ Suporte a Profiles para flexibilidade  
+✅ Melhor para fins de estudo  
+✅ Documentação completa em `DOCKER_SETUP.md`  
+
+---
+
+## 🚀 Como Usar (Quick Start)
+
+### Opção 1: Menu Interativo (Windows)
 
 ```bash
-docker-compose up -d
+cd infrastructure
+docker-compose-menu.bat
 ```
 
-**O que será iniciado:**
-- Backend (Spring Boot) na porta 8080
-- Frontend (React) na porta 3000
-- PostgreSQL na porta 5432
+Escolha a opção desejada e o script cuida de tudo!
 
-**Parar:**
+### Opção 2: Modo Completo (Backend + Frontend + BD + Observabilidade)
+
 ```bash
-docker-compose down
+cd infrastructure
+docker-compose -f docker-compose-unified.yml up -d
 ```
 
-**Ver logs:**
+Acesse:
+- 🎨 Frontend: http://localhost:3000
+- 🔙 Backend: http://localhost:8080/api
+- 📈 Grafana: http://localhost:3001 (admin/admin)
+- 🔍 Jaeger: http://localhost:16686
+
+### Opção 3: Só Observabilidade (para Backend local)
+
 ```bash
-docker-compose logs -f
+cd infrastructure
+docker-compose -f docker-compose-unified.yml --profile observability up -d
+```
+
+Depois rode Backend localmente:
+```bash
+cd backend
+mvn spring-boot:run
+```
+
+### Parar Tudo
+
+```bash
+docker-compose -f docker-compose-unified.yml down
 ```
 
 ---
 
-### Observabilidade (Prometheus, Grafana, Jaeger)
+## 📚 Documentação Completa
 
-Para iniciar o stack de observabilidade:
-
-```bash
-docker-compose -f docker-compose-observability.yml up -d
-```
-
-**O que será iniciado:**
-- Prometheus (métricas) - http://localhost:9090
+**Leia `DOCKER_SETUP.md` para:**
+- Variáveis de ambiente
+- Troubleshooting
+- Exemplos de uso
+- Configurações avançadas
 - Grafana (dashboards) - http://localhost:3000
 - Jaeger (tracing distribuído) - http://localhost:6831 (UDP)
 - Jaeger UI - http://localhost:16686

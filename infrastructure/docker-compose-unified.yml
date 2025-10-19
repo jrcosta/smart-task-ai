@@ -1,0 +1,151 @@
+version: '3.8'
+
+# Smart Task Manager - Docker Compose Unificado
+# 
+# Este arquivo combina a execução da aplicação completa com observabilidade
+# Use para ambientes de desenvolvimento, testes e estudo
+#
+# Opções de execução:
+# - Apenas aplicação:      docker-compose up -d
+# - Com observabilidade:   ENABLE_OBSERVABILITY=true docker-compose up -d
+# - Remover tudo:          docker-compose down -v
+
+services:
+  # ===== BANCO DE DADOS =====
+  postgres:
+    image: postgres:15-alpine
+    container_name: smarttask-postgres
+    environment:
+      POSTGRES_DB: smarttask
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - smarttask-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ===== OBSERVABILIDADE - JAEGER (opcional) =====
+  jaeger:
+    image: jaegertracing/all-in-one:latest
+    container_name: smarttask-jaeger
+    environment:
+      - COLLECTOR_OTLP_ENABLED=true
+    ports:
+      - "16686:16686"  # Jaeger UI
+      - "14250:14250"  # gRPC collector
+      - "4317:4317"    # OTLP gRPC receiver
+      - "4318:4318"    # OTLP HTTP receiver
+    networks:
+      - smarttask-network
+    restart: unless-stopped
+    profiles:
+      - observability
+
+  # ===== OBSERVABILIDADE - PROMETHEUS (opcional) =====
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: smarttask-prometheus
+    volumes:
+      - ./observability/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
+    ports:
+      - "9090:9090"
+    networks:
+      - smarttask-network
+    restart: unless-stopped
+    depends_on:
+      - backend
+    profiles:
+      - observability
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  # ===== OBSERVABILIDADE - GRAFANA (opcional) =====
+  grafana:
+    image: grafana/grafana:latest
+    container_name: smarttask-grafana
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_INSTALL_PLUGINS=grafana-piechart-panel
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./observability/grafana/dashboards:/etc/grafana/provisioning/dashboards
+      - ./observability/grafana/datasources:/etc/grafana/provisioning/datasources
+    ports:
+      - "3001:3000"
+    networks:
+      - smarttask-network
+    restart: unless-stopped
+    depends_on:
+      - prometheus
+      - jaeger
+    profiles:
+      - observability
+
+  # ===== BACKEND - SPRING BOOT =====
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: smarttask-backend
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/smarttask
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+      JWT_SECRET: ${JWT_SECRET:-your-super-secret-jwt-key-change-in-production}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-your-openai-api-key}
+      OTEL_EXPORTER_JAEGER_ENDPOINT: http://jaeger:14250
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://jaeger:4317
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - smarttask-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # ===== FRONTEND - REACT =====
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: smarttask-frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+    networks:
+      - smarttask-network
+    restart: unless-stopped
+    environment:
+      - VITE_API_URL=http://localhost:8080/api
+
+volumes:
+  postgres_data:
+  prometheus_data:
+  grafana_data:
+
+networks:
+  smarttask-network:
+    driver: bridge
