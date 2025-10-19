@@ -115,3 +115,25 @@ export interface AIAnalysisResponse {
   suggestedSubtasks: string[];
   analysis: string;
 }
+
+/**
+ * Requisição para atualizar configurações do usuário.
+ */
+export interface SettingsRequest {
+  openaiApiKey?: string;
+  twilioAccountSid?: string;
+  twilioAuthToken?: string;
+  twilioWhatsappNumber?: string;
+  userWhatsappNumber?: string;
+}
+
+/**
+ * Resposta com o estado das configurações do usuário.
+ */
+export interface SettingsResponse {
+  openaiConfigured: boolean;
+  twilioConfigured: boolean;
+  twilioWhatsappNumber?: string;
+  userWhatsappNumber?: string;
+  message: string;
+}
