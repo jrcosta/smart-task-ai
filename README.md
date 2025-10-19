@@ -64,25 +64,31 @@ Um gerenciador de tarefas inteligente com integração de IA, desenvolvido com *
 - **PostgreSQL 15+** (ou use H2 para desenvolvimento)
 - **Chave da API OpenAI** (opcional, mas recomendado)
 
-## 🚀 Como Executar
+## 🚀 Como Começar
 
-### Opção 1: Com Docker (Recomendado)
+### 📚 Primeiro Passo: Leia a Documentação
+
+**Para iniciantes**: Abra [`docs/COMECE_AQUI.md`](docs/COMECE_AQUI.md) - guia completo de setup!
+
+**Para entender tudo**: Consulte [`docs/INDICE_DOCUMENTACAO.md`](docs/INDICE_DOCUMENTACAO.md) - índice central.
+
+### 🚀 Opção 1: Com Docker (Recomendado - Mais Fácil)
 
 1. Clone o repositório:
 ```bash
 git clone https://github.com/jrcosta/smart-task-ai.git
-cd smart-task-ai
+cd smart-task-ai/infrastructure
 ```
 
-2. Configure as variáveis de ambiente:
+2. Execute o menu interativo (Windows):
 ```bash
-cp .env.example .env
-# Edite o arquivo .env com suas configurações
+docker-compose-menu.bat
+# Escolha opção [1] para modo completo
 ```
 
-3. Execute com Docker Compose:
+Ou use Docker Compose diretamente:
 ```bash
-docker-compose -f infrastructure/docker-compose.yml up -d
+docker-compose -f docker-compose-unified.yml up -d
 ```
 
 4. Acesse a aplicação:
@@ -226,20 +232,20 @@ Após iniciar o backend (`mvn spring-boot:run` ou Docker), acesse:
 - **OpenAPI JSON**: http://localhost:8080/api/docs
 - **OpenAPI YAML**: http://localhost:8080/api/docs.yaml
 
-### 📖 Documentação JavaDoc
+## 📖 Documentação JavaDoc
 
 A documentação completa do código-fonte Java (JavaDoc) pode ser gerada e visualizada:
 
 **Gerar documentação (Forma Rápida - Windows):**
 ```bash
 # Duplo-clique em:
-scripts/RUN-JAVADOC.bat
+./scripts/RUN-JAVADOC.bat
 ```
 
 **Gerar documentação (Alternativas):**
 ```bash
 # Windows (PowerShell)
-scripts/generate-javadoc.ps1
+./scripts/generate-javadoc.ps1
 
 # Windows (Batch)
 scripts/generate-javadoc.bat

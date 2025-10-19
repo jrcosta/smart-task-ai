@@ -29,7 +29,7 @@ echo.
 
 REM Ir para backend
 echo [2] Localizando diretorio backend...
-cd /d "%~dp0..\backend" || (
+cd /d "%~dp0backend" || (
     echo [ERRO] Diretorio backend nao encontrado
     pause
     exit /b 1
