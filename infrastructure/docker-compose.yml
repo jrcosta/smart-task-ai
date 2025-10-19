@@ -79,7 +79,10 @@ services:
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: postgres
       JWT_SECRET: ${JWT_SECRET:-your-super-secret-jwt-key-change-in-production}
-      OPENAI_API_KEY: ${OPENAI_API_KEY:-your-openai-api-key}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      TWILIO_ACCOUNT_SID: ${TWILIO_ACCOUNT_SID:-}
+      TWILIO_AUTH_TOKEN: ${TWILIO_AUTH_TOKEN:-}
+      TWILIO_WHATSAPP_NUMBER: ${TWILIO_WHATSAPP_NUMBER:-}
       OTEL_EXPORTER_JAEGER_ENDPOINT: http://jaeger:14250
       OTEL_EXPORTER_OTLP_ENDPOINT: http://jaeger:4317
     ports:
