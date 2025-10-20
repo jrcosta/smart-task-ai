@@ -10,16 +10,16 @@ import com.smarttask.repository.NotificationPreferenceRepository;
 import com.smarttask.repository.TaskRepository;
 import com.smarttask.repository.UserRepository;
 import com.smarttask.security.UserPrincipal;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.Comparator;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
-
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.util.List;
 
 /**
  * Orquestra preferências e rotinas agendadas de notificações via WhatsApp,
@@ -30,176 +30,234 @@ import java.util.List;
 @Slf4j
 public class NotificationService {
 
+    /** Expressao cron para execucoes a cada minuto. */
+    private static final String CRON_EVERY_MINUTE = "0 * * * * *";
+
+    /** Expressao cron para execucoes a cada seis horas. */
+    private static final String CRON_EVERY_SIX_HOURS = "0 0 */6 * * *";
+
+    /** Mensagem exibida quando o numero de WhatsApp nao foi informado. */
+    private static final String VALID_NUMBER_MESSAGE =
+            "Configure um numero de WhatsApp valido antes de ativar as "
+                    + "notificacoes.";
+
+    /** Ordenador que prioriza tarefas por maior prioridade primeiro. */
+    private static final Comparator<Task> PRIORITY_COMPARATOR =
+            Comparator.comparing(
+                    Task::getPriority,
+                    Comparator.nullsLast(Comparator.naturalOrder()))
+                    .reversed();
+
+    /** Repositório de preferências de notificação por usuário. */
     private final NotificationPreferenceRepository preferenceRepository;
+
+    /** Repositório de usuários. */
     private final UserRepository userRepository;
+
+    /** Repositório de tarefas associado às notificações. */
     private final TaskRepository taskRepository;
+
+        /** Servico responsavel por enviar mensagens via WhatsApp. */
     private final WhatsAppService whatsAppService;
 
+                /**
+                 * Salva ou atualiza as preferencias de notificacao do usuario
+                 * autenticado.
+                 *
+                 * @param request dados da preferencia informados pelo usuario
+                 * @param currentUser usuario autenticado
+                 * @return preferencias persistidas
+                 */
     @Transactional
-    public NotificationPreferenceResponse savePreferences(NotificationPreferenceRequest request, UserPrincipal currentUser) {
-        User user = userRepository.findById(currentUser.getId())
-                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+    public NotificationPreferenceResponse savePreferences(
+            final NotificationPreferenceRequest request,
+            final UserPrincipal currentUser) {
+        final User user = userRepository.findById(currentUser.getId())
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "User not found"));
 
-        NotificationPreference preference = preferenceRepository.findByUserId(user.getId())
+        NotificationPreference preference =
+                preferenceRepository.findByUserId(user.getId())
                 .orElse(NotificationPreference.builder()
                         .user(user)
                         .build());
 
-        String sanitizedNumber = request.getWhatsappNumber() != null ? request.getWhatsappNumber().trim() : null;
+        final String sanitizedNumber = sanitizeNumber(
+                request.getWhatsappNumber());
 
-        if (Boolean.TRUE.equals(request.getEnabled()) && !StringUtils.hasText(sanitizedNumber)) {
-            throw new IllegalStateException("Configure um número de WhatsApp válido antes de ativar as notificações.");
+        if (Boolean.TRUE.equals(request.getEnabled())
+                && !StringUtils.hasText(sanitizedNumber)) {
+            throw new IllegalStateException(VALID_NUMBER_MESSAGE);
         }
 
-        preference.setWhatsappNumber(StringUtils.hasText(sanitizedNumber) ? sanitizedNumber : null);
-        preference.setEnabled(request.getEnabled() != null ? request.getEnabled() : false);
-        
-        if (request.getDailyReminderTime() != null && !request.getDailyReminderTime().isEmpty()) {
-            preference.setDailyReminderTime(LocalTime.parse(request.getDailyReminderTime()));
+        preference.setWhatsappNumber(
+                StringUtils.hasText(sanitizedNumber)
+                        ? sanitizedNumber
+                        : null);
+        preference.setEnabled(Boolean.TRUE.equals(request.getEnabled()));
+
+        if (StringUtils.hasText(request.getDailyReminderTime())) {
+            preference.setDailyReminderTime(
+                    LocalTime.parse(request.getDailyReminderTime()));
         }
-        
+
         if (request.getTimezone() != null) {
             preference.setTimezone(request.getTimezone());
         }
-        
+
         if (request.getSendOverdueAlerts() != null) {
             preference.setSendOverdueAlerts(request.getSendOverdueAlerts());
         }
-        
+
         if (request.getSendCompletionSummary() != null) {
-            preference.setSendCompletionSummary(request.getSendCompletionSummary());
+            preference.setSendCompletionSummary(
+                    request.getSendCompletionSummary());
         }
 
         preference = preferenceRepository.save(preference);
         return mapToResponse(preference);
     }
 
+    /**
+     * Recupera as preferências configuradas pelo usuário autenticado.
+     *
+     * @param currentUser usuário autenticado
+     * @return preferências encontradas
+     */
     @Transactional(readOnly = true)
-    public NotificationPreferenceResponse getPreferences(UserPrincipal currentUser) {
-        NotificationPreference preference = preferenceRepository.findByUserId(currentUser.getId())
-                .orElseThrow(() -> new ResourceNotFoundException("Notification preferences not found"));
-        
+    public NotificationPreferenceResponse getPreferences(
+            final UserPrincipal currentUser) {
+        final NotificationPreference preference = preferenceRepository
+                .findByUserId(currentUser.getId())
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Notification preferences not found"));
+
         return mapToResponse(preference);
     }
 
-    public void sendTestNotification(UserPrincipal currentUser) {
-        NotificationPreference preference = preferenceRepository.findByUserId(currentUser.getId())
-                .orElseThrow(() -> new ResourceNotFoundException("Notification preferences not found"));
+    /**
+     * Envia uma mensagem de teste para validar as configurações atuais.
+     *
+     * @param currentUser usuário solicitante
+     */
+    public void sendTestNotification(final UserPrincipal currentUser) {
+        preferenceRepository.findByUserId(currentUser.getId())
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Notification preferences not found"));
 
         whatsAppService.sendTestMessage(
-            currentUser.getId(),
-            currentUser.getUsername()
-        );
+                currentUser.getId(),
+                currentUser.getUsername());
     }
 
-    // Executar a cada minuto para verificar se há notificações para enviar
-    @Scheduled(cron = "0 * * * * *") // A cada minuto
+    /**
+     * Agenda lembretes diários de tarefas ativas.
+     */
+    @Scheduled(cron = CRON_EVERY_MINUTE)
     @Transactional
     public void sendScheduledNotifications() {
-        LocalTime currentTime = LocalTime.now().withSecond(0).withNano(0);
-        
-        List<NotificationPreference> preferences = preferenceRepository.findByDailyReminderTime(currentTime);
-        
-    log.info("Verificando notificações agendadas às {}: {} usuários encontrados", currentTime, preferences.size());
-        
-        for (NotificationPreference preference : preferences) {
+        final LocalTime currentTime = LocalTime.now().withSecond(0).withNano(0);
+        final List<NotificationPreference> preferences = preferenceRepository
+                .findByDailyReminderTime(currentTime);
+
+        log.info(
+                "Verificando notificacoes agendadas as {}: {} "
+                        + "usuarios encontrados",
+                currentTime,
+                preferences.size());
+
+        for (final NotificationPreference preference : preferences) {
             try {
                 sendDailyReminder(preference);
-            } catch (Exception e) {
-                log.error("Erro ao enviar notificação para o usuário {}: {}",
-                        preference.getUser().getId(), e.getMessage());
+            } catch (Exception exception) {
+                log.error(
+                        "Erro ao enviar notificacao para o usuario {}: {}",
+                        preference.getUser().getId(),
+                        exception.getMessage());
             }
         }
     }
 
-    // Verificar tarefas atrasadas a cada 6 horas
-    @Scheduled(cron = "0 0 */6 * * *")
+    /**
+     * Agenda alertas periódicos sobre tarefas atrasadas.
+     */
+    @Scheduled(cron = CRON_EVERY_SIX_HOURS)
     @Transactional
     public void sendOverdueAlerts() {
-        List<NotificationPreference> preferences = preferenceRepository.findAllEnabled();
-        
-    log.info("Verificando tarefas atrasadas: {} usuários com notificações habilitadas", preferences.size());
-        
-        for (NotificationPreference preference : preferences) {
-            if (!preference.getSendOverdueAlerts()) {
+        final List<NotificationPreference> preferences =
+                preferenceRepository.findAllEnabled();
+
+        log.info(
+                "Verificando tarefas atrasadas: {} usuarios com notificacoes "
+                        + "habilitadas",
+                preferences.size());
+
+        for (final NotificationPreference preference : preferences) {
+            if (!Boolean.TRUE.equals(preference.getSendOverdueAlerts())) {
                 continue;
             }
-            
+
             try {
-                List<Task> overdueTasks = taskRepository.findOverdueTasks(
-                    preference.getUser().getId(), 
-                    LocalDateTime.now()
-                );
-                
+                final List<Task> overdueTasks = taskRepository.findOverdueTasks(
+                        preference.getUser().getId(),
+                        LocalDateTime.now());
+
                 if (!overdueTasks.isEmpty()) {
                     whatsAppService.sendOverdueAlert(
-                        preference.getUser().getId(),
-                        preference.getUser().getUsername(),
-                        overdueTasks
-                    );
+                            preference.getUser().getId(),
+                            preference.getUser().getUsername(),
+                            overdueTasks);
                 }
-            } catch (Exception e) {
-                log.error("Erro ao enviar alerta de atraso para o usuário {}: {}",
-                        preference.getUser().getId(), e.getMessage());
+            } catch (Exception exception) {
+                log.error(
+                        "Erro ao enviar alerta de atraso para o usuario {}: {}",
+                        preference.getUser().getId(),
+                        exception.getMessage());
             }
         }
     }
 
-    private void sendDailyReminder(NotificationPreference preference) {
-        User user = preference.getUser();
-        
-        // Buscar tarefas pendentes e em progresso
-        List<Task> todoTasks = taskRepository.findByUserIdAndStatus(
-            user.getId(), 
-            Task.TaskStatus.TODO
-        );
-        
-        List<Task> inProgressTasks = taskRepository.findByUserIdAndStatus(
-            user.getId(), 
-            Task.TaskStatus.IN_PROGRESS
-        );
-        
-        // Combinar as listas
-        todoTasks.addAll(inProgressTasks);
-        
-        // Ordenar por prioridade (URGENT > HIGH > MEDIUM > LOW)
-        todoTasks.sort((t1, t2) -> {
-            int priority1 = getPriorityValue(t1.getPriority());
-            int priority2 = getPriorityValue(t2.getPriority());
-            return Integer.compare(priority2, priority1);
-        });
-        
+    private void sendDailyReminder(final NotificationPreference preference) {
+        final User user = preference.getUser();
+
+        final List<Task> tasksToReview = taskRepository.findByUserIdAndStatus(
+                user.getId(), Task.TaskStatus.TODO);
+        tasksToReview.addAll(taskRepository.findByUserIdAndStatus(user.getId(),
+                Task.TaskStatus.IN_PROGRESS));
+
+        tasksToReview.sort(PRIORITY_COMPARATOR);
+
         whatsAppService.sendDailyTaskReminder(
-            user.getId(),
-            user.getUsername(),
-            todoTasks
-        );
-        
-    log.info("Lembrete diário enviado para o usuário {} com {} tarefas", user.getId(), todoTasks.size());
+                user.getId(),
+                user.getUsername(),
+                tasksToReview);
+
+        log.info(
+                "Lembrete diario enviado para o usuario {} com {} tarefas",
+                user.getId(),
+                tasksToReview.size());
     }
 
-    private int getPriorityValue(Task.TaskPriority priority) {
-        switch (priority) {
-            case URGENT: return 4;
-            case HIGH: return 3;
-            case MEDIUM: return 2;
-            case LOW: return 1;
-            default: return 0;
-        }
-    }
+    private NotificationPreferenceResponse mapToResponse(
+            final NotificationPreference preference) {
+        final String reminderTime = preference.getDailyReminderTime() == null
+                ? null
+                : preference.getDailyReminderTime().toString();
 
-    private NotificationPreferenceResponse mapToResponse(NotificationPreference preference) {
         return NotificationPreferenceResponse.builder()
                 .id(preference.getId())
                 .whatsappNumber(preference.getWhatsappNumber())
                 .enabled(preference.getEnabled())
-                .dailyReminderTime(preference.getDailyReminderTime() != null ? 
-                                   preference.getDailyReminderTime().toString() : null)
+                .dailyReminderTime(reminderTime)
                 .timezone(preference.getTimezone())
                 .sendOverdueAlerts(preference.getSendOverdueAlerts())
                 .sendCompletionSummary(preference.getSendCompletionSummary())
                 .createdAt(preference.getCreatedAt())
                 .updatedAt(preference.getUpdatedAt())
                 .build();
+    }
+
+    private String sanitizeNumber(final String whatsappNumber) {
+        return whatsappNumber == null ? null : whatsappNumber.trim();
     }
 }
