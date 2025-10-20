@@ -12,74 +12,64 @@ import java.time.LocalDateTime;
 import java.util.Set;
 
 /**
- * Data Transfer Object (DTO) para requisições de criação/atualização de tarefas.
- * 
- * <p>Este DTO é usado para transferir dados da requisição HTTP para o serviço de negócio.
- * Inclui validações de entrada para garantir integridade dos dados.</p>
- * 
- * <p>Uso em endpoints:</p>
- * <ul>
- *   <li>{@code POST /tasks} - Criar nova tarefa</li>
- *   <li>{@code PUT /tasks/{id}} - Atualizar tarefa existente</li>
- *   <li>{@code POST /tasks/ai} - Criar com análise de IA</li>
- * </ul>
- * 
- * @author Smart Task AI Team
- * @version 1.0
- * @since 2025-10
- * @see com.smarttask.controller.TaskController
- * @see com.smarttask.service.TaskService
+ * Estrutura de transporte para criacao e atualizacao de tarefas.
  */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class TaskRequest {
-    
+
+    /** Comprimento minimo aceito para o titulo da tarefa. */
+    private static final int MIN_TITLE_LENGTH = 3;
+
+    /** Comprimento maximo permitido para o titulo da tarefa. */
+    private static final int MAX_TITLE_LENGTH = 200;
+
     /**
-     * Título obrigatório da tarefa.
+     * Titulo obrigatorio da tarefa.
      * Deve ter entre 3 e 200 caracteres.
      */
     @NotBlank
-    @Size(min = 3, max = 200)
+    @Size(min = MIN_TITLE_LENGTH, max = MAX_TITLE_LENGTH)
     private String title;
-    
+
     /**
-     * Descrição detalhada da tarefa (opcional).
+     * Descricao detalhada da tarefa (opcional).
      */
     private String description;
-    
+
     /**
      * Status da tarefa (TODO, IN_PROGRESS, COMPLETED, CANCELLED).
-     * Se não informado, padrão é TODO.
+     * Se nao informado, padrao e TODO.
      */
     private TaskStatus status;
-    
+
     /**
      * Prioridade da tarefa (LOW, MEDIUM, HIGH, URGENT).
-     * Se não informado, padrão é MEDIUM.
+     * Se nao informado, padrao e MEDIUM.
      */
     private TaskPriority priority;
-    
+
     /**
      * Data e hora de vencimento da tarefa (opcional).
      */
     private LocalDateTime dueDate;
-    
+
     /**
-     * Estimativa de horas necessárias para concluir (opcional).
+     * Estimativa de horas necessarias para concluir (opcional).
      * Pode ser sugerido pela IA.
      */
     private Integer estimatedHours;
-    
+
     /**
-     * Conjunto de tags para categorização (opcional).
-     * Permite múltiplas tags por tarefa.
+     * Conjunto de tags para categorizacao (opcional).
+     * Permite multiplas tags por tarefa.
      */
     private Set<String> tags;
-    
+
     /**
-     * ID da tarefa pai, para criação de subtarefas (opcional).
-     * Se informado, a tarefa será criada como subtarefa.
+     * ID da tarefa pai, para criacao de subtarefas (opcional).
+     * Se informado, a tarefa sera criada como subtarefa.
      */
     private Long parentTaskId;
 }

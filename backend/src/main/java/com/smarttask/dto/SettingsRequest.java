@@ -6,37 +6,38 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * DTO para requisição de atualização de configurações do usuário.
+ * DTO para requisicao de atualizacao de configuracoes do usuario.
  */
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class SettingsRequest {
-    
+
     /**
      * Chave de API da OpenAI.
-     * Deixe vazio para remover a configuração.
+     * Deixe vazio para remover a configuracao.
      */
     private String openaiApiKey;
-    
+
     /**
      * Account SID do Twilio.
      */
     private String twilioAccountSid;
-    
+
     /**
      * Auth Token do Twilio.
      */
     private String twilioAuthToken;
-    
+
     /**
-     * Número WhatsApp do Twilio (formato: whatsapp:+14155238886).
+     * Numero WhatsApp do Twilio (formato: whatsapp:+14155238886).
      */
     private String twilioWhatsappNumber;
-    
+
     /**
-     * Número WhatsApp do usuário para receber notificações (formato: whatsapp:+5511999999999).
+     * Numero WhatsApp do usuario para receber notificacoes.
+     * Use formato whatsapp:+5511999999999.
      */
     private String userWhatsappNumber;
 }

@@ -1,37 +1,38 @@
 package com.smarttask.repository;
 
+import java.util.Optional;
+
 import com.smarttask.model.UserSettings;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.Optional;
-
 /**
- * Repositório para operações de persistência de {@link UserSettings}.
+ * Repositorio para operacoes de persistencia de {@link UserSettings}.
  */
 @Repository
-public interface UserSettingsRepository extends CrudRepository<UserSettings, Long> {
-    
+public interface UserSettingsRepository
+    extends CrudRepository<UserSettings, Long> {
+
     /**
-     * Busca as configurações de um usuário específico.
-     * 
-     * @param userId ID do usuário
-     * @return Optional contendo as configurações se encontradas
+     * Busca as configuracoes de um usuario especifico.
+     *
+     * @param userId identificador do usuario
+     * @return configuracoes encapsuladas em {@link Optional}
      */
     Optional<UserSettings> findByUserId(Long userId);
-    
+
     /**
-     * Verifica se existem configurações para um usuário.
-     * 
-     * @param userId ID do usuário
-     * @return true se existem configurações, false caso contrário
+     * Verifica se existem configuracoes para um usuario.
+     *
+     * @param userId identificador do usuario
+     * @return {@code true} quando ha configuracoes cadastradas
      */
     boolean existsByUserId(Long userId);
-    
+
     /**
-     * Remove as configurações de um usuário.
-     * 
-     * @param userId ID do usuário
+     * Remove as configuracoes de um usuario.
+     *
+     * @param userId identificador do usuario
      */
     void deleteByUserId(Long userId);
 }

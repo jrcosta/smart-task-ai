@@ -13,9 +13,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AIAnalysisRequest {
-    
+    /** Texto da tarefa que deve ser analisado pela IA. */
     @NotBlank
     private String text;
-    
+
+    /** Contexto adicional opcional para enriquecer a análise. */
     private String context;
 }

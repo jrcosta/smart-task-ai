@@ -1,6 +1,22 @@
 package com.smarttask.model;
 
-import jakarta.persistence.*;
+import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
+
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.CollectionTable;
+import jakarta.persistence.Column;
+import jakarta.persistence.ElementCollection;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -12,15 +28,11 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.Set;
-
 /**
  * Entidade JPA que representa um usuário do sistema Smart Task Manager.
- * 
- * <p>Armazena informações de cadastro, autenticação e perfis (roles) de usuários,
- * incluindo:</p>
+ *
+ * <p>Armazena informacoes de cadastro, autenticacao e perfis (roles) de
+ * usuarios, incluindo:</p>
  * <ul>
  *   <li>Credenciais (username, email, senha)</li>
  *   <li>Dados pessoais (nome completo, avatar)</li>
@@ -29,10 +41,10 @@ import java.util.Set;
  *   <li>Tarefas associadas</li>
  *   <li>Datas de auditoria (criação e modificação)</li>
  * </ul>
- * 
+ *
  * <p>Usa {@link AuditingEntityListener} para rastreamento automático de datas
  * de criação e modificação.</p>
- * 
+ *
  * @author Smart Task AI Team
  * @version 1.0
  * @since 2025-10
@@ -45,6 +57,12 @@ import java.util.Set;
 @AllArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
 public class User {
+
+    /** Tamanho mínimo permitido para o username. */
+    public static final int USERNAME_MIN_LENGTH = 3;
+
+    /** Tamanho máximo permitido para o username. */
+    public static final int USERNAME_MAX_LENGTH = 50;
 
     /**
      * Identificador único do usuário.
@@ -59,7 +77,7 @@ public class User {
      * Deve ter entre 3 e 50 caracteres.
      */
     @NotBlank
-    @Size(min = 3, max = 50)
+    @Size(min = USERNAME_MIN_LENGTH, max = USERNAME_MAX_LENGTH)
     @Column(unique = true, nullable = false)
     private String username;
 
@@ -108,7 +126,9 @@ public class User {
      * Determina permissões no sistema (ex: ROLE_USER, ROLE_ADMIN).
      */
     @ElementCollection(fetch = FetchType.EAGER)
-    @CollectionTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"))
+    @CollectionTable(
+        name = "user_roles",
+        joinColumns = @JoinColumn(name = "user_id"))
     @Column(name = "role")
     @Builder.Default
     private Set<String> roles = new HashSet<>();
@@ -117,7 +137,10 @@ public class User {
      * Conjunto de tarefas criadas por este usuário.
      * Deletadas em cascata quando o usuário é removido.
      */
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(
+        mappedBy = "user",
+        cascade = CascadeType.ALL,
+        orphanRemoval = true)
     @Builder.Default
     private Set<Task> tasks = new HashSet<>();
 

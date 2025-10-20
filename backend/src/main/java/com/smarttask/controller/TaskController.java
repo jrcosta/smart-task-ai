@@ -10,128 +10,143 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
 /**
- * Controlador REST que gerencia os endpoints relacionados a tarefas.
- * 
- * <p>Fornece operações CRUD (Create, Read, Update, Delete) completas para tarefas,
- * incluindo:</p>
- * <ul>
- *   <li>Criar tarefas (com ou sem análise de IA)</li>
- *   <li>Listar tarefas (todas ou filtradas por status/prioridade)</li>
- *   <li>Obter tarefa específica</li>
- *   <li>Atualizar status, prioridade e detalhes</li>
- *   <li>Deletar tarefas</li>
- * </ul>
- * 
- * <p>Todos os endpoints requerem autenticação JWT e operam em contexto do
- * usuário autenticado (isolamento de dados por usuário).</p>
- * 
- * <p>Base URL: {@code /tasks}</p>
- * 
- * @author Smart Task AI Team
- * @version 1.0
- * @since 2025-10
- * @see TaskService
- * @see TaskRequest
- * @see TaskResponse
+ * Controlador REST para operacoes de tarefas vinculadas ao usuario autenticado.
  */
-@RequiredArgsConstructor
 @RestController
 @RequestMapping("/tasks")
 @RequiredArgsConstructor
-public class TaskController {
+public final class TaskController {
 
-    /** Serviço de negócio para tarefas */
+    /** Servico de negocio responsavel pelas operacoes de tarefas. */
     private final TaskService taskService;
 
     /**
      * Cria uma nova tarefa.
-     * 
-     * @param request DTO com dados da tarefa
-     * @param currentUser Usuário autenticado
-     * @return Resposta HTTP 201 com a tarefa criada
+     *
+     * @param request dados recebidos do cliente
+     * @param currentUser usuario autenticado
+     * @return resposta HTTP 201 com a tarefa criada
      */
     @PostMapping
     public ResponseEntity<TaskResponse> createTask(
-            @Valid @RequestBody TaskRequest request,
-            @AuthenticationPrincipal UserPrincipal currentUser) {
+            @Valid @RequestBody final TaskRequest request,
+            @AuthenticationPrincipal final UserPrincipal currentUser) {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(taskService.createTask(request, currentUser));
     }
 
     /**
-     * Cria uma nova tarefa com análise de IA.
-     * 
-     * <p>A IA analisará a tarefa e fornecerá sugestões de prioridade,
-     * tags e subtarefas recomendadas.</p>
-     * 
-     * @param request DTO com dados da tarefa
-     * @param currentUser Usuário autenticado
-     * @return Resposta HTTP 201 com a tarefa criada e análise de IA
+     * Cria uma tarefa com analise de IA que sugere prioridade e tags.
+     * Subtarefas sao propostas automaticamente a partir da analise.
+     *
+     * @param request dados recebidos do cliente
+     * @param currentUser usuario autenticado
+     * @return resposta HTTP 201 com a tarefa enriquecida pela analise de IA
      */
     @PostMapping("/ai")
     public ResponseEntity<TaskResponse> createTaskWithAI(
-            @Valid @RequestBody TaskRequest request,
-            @AuthenticationPrincipal UserPrincipal currentUser) {
+            @Valid @RequestBody final TaskRequest request,
+            @AuthenticationPrincipal final UserPrincipal currentUser) {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(taskService.createTaskWithAI(request, currentUser));
     }
 
     /**
-     * Lista todas as tarefas do usuário autenticado.
-     * 
-     * @param currentUser Usuário autenticado
-     * @return Resposta HTTP 200 com lista de tarefas
+     * Lista todas as tarefas do usuario autenticado.
+     *
+     * @param currentUser usuario autenticado
+     * @return resposta HTTP 200 com lista de tarefas
      */
     @GetMapping
     public ResponseEntity<List<TaskResponse>> getAllTasks(
-            @AuthenticationPrincipal UserPrincipal currentUser) {
-        return ResponseEntity.ok(taskService.getAllTasks(currentUser));
+            @AuthenticationPrincipal final UserPrincipal currentUser) {
+    return ResponseEntity.ok(
+        taskService.getAllTasks(currentUser));
     }
 
     /**
-     * Lista tarefas filtradas por status.
-     * 
-     * @param status Status desejado (TODO, IN_PROGRESS, COMPLETED, CANCELLED)
-     * @param currentUser Usuário autenticado
-     * @return Resposta HTTP 200 com tarefas do status especificado
+     * Lista tarefas filtradas por status para o usuario autenticado.
+     *
+     * @param status status desejado (TODO, IN_PROGRESS, COMPLETED, CANCELLED)
+     * @param currentUser usuario autenticado
+     * @return resposta HTTP 200 com tarefas do status informado
      */
     @GetMapping("/status/{status}")
     public ResponseEntity<List<TaskResponse>> getTasksByStatus(
-            @PathVariable TaskStatus status,
-            @AuthenticationPrincipal UserPrincipal currentUser) {
-        return ResponseEntity.ok(taskService.getTasksByStatus(status, currentUser));
+            @PathVariable final TaskStatus status,
+            @AuthenticationPrincipal final UserPrincipal currentUser) {
+    return ResponseEntity.ok(
+        taskService.getTasksByStatus(status, currentUser));
     }
 
+    /**
+     * Consulta as tarefas atrasadas do usuario autenticado.
+     *
+     * @param currentUser usuario autenticado
+     * @return lista de tarefas em atraso
+     */
     @GetMapping("/overdue")
     public ResponseEntity<List<TaskResponse>> getOverdueTasks(
-            @AuthenticationPrincipal UserPrincipal currentUser) {
-        return ResponseEntity.ok(taskService.getOverdueTasks(currentUser));
+            @AuthenticationPrincipal final UserPrincipal currentUser) {
+    return ResponseEntity.ok(
+        taskService.getOverdueTasks(currentUser));
     }
 
+    /**
+     * Busca uma tarefa especifica pelo identificador.
+     *
+     * @param id identificador da tarefa
+     * @param currentUser usuario autenticado
+     * @return tarefa localizada para o usuario
+     */
     @GetMapping("/{id}")
     public ResponseEntity<TaskResponse> getTaskById(
-            @PathVariable Long id,
-            @AuthenticationPrincipal UserPrincipal currentUser) {
-        return ResponseEntity.ok(taskService.getTaskById(id, currentUser));
+            @PathVariable final Long id,
+            @AuthenticationPrincipal final UserPrincipal currentUser) {
+    return ResponseEntity.ok(
+        taskService.getTaskById(id, currentUser));
     }
 
+    /**
+     * Atualiza os dados de uma tarefa existente.
+     *
+     * @param id identificador da tarefa
+     * @param request novos dados informados pelo cliente
+     * @param currentUser usuario autenticado
+     * @return tarefa atualizada
+     */
     @PutMapping("/{id}")
     public ResponseEntity<TaskResponse> updateTask(
-            @PathVariable Long id,
-            @Valid @RequestBody TaskRequest request,
-            @AuthenticationPrincipal UserPrincipal currentUser) {
-        return ResponseEntity.ok(taskService.updateTask(id, request, currentUser));
+            @PathVariable final Long id,
+            @Valid @RequestBody final TaskRequest request,
+            @AuthenticationPrincipal final UserPrincipal currentUser) {
+    return ResponseEntity.ok(
+        taskService.updateTask(id, request, currentUser));
     }
 
+    /**
+     * Remove uma tarefa do usuario autenticado.
+     *
+     * @param id identificador da tarefa
+     * @param currentUser usuario autenticado
+     * @return resposta sem conteudo em caso de sucesso
+     */
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteTask(
-            @PathVariable Long id,
-            @AuthenticationPrincipal UserPrincipal currentUser) {
+            @PathVariable final Long id,
+            @AuthenticationPrincipal final UserPrincipal currentUser) {
         taskService.deleteTask(id, currentUser);
         return ResponseEntity.noContent().build();
     }

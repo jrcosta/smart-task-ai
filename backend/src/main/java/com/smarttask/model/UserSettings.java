@@ -1,6 +1,16 @@
 package com.smarttask.model;
 
-import jakarta.persistence.*;
+import java.time.LocalDateTime;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -9,13 +19,11 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import java.time.LocalDateTime;
-
 /**
- * Entidade JPA que armazena configurações personalizadas do usuário,
- * incluindo chaves de API para integração com serviços externos.
- * 
- * <p>As chaves são armazenadas de forma criptografada para garantir segurança.</p>
+ * Entidade JPA que armazena configuracoes personalizadas do usuario.
+ * Inclui chaves de API para integracoes com servicos externos.
+ *
+ * <p>As chaves ficam criptografadas para garantir seguranca.</p>
  */
 @Entity
 @Table(name = "user_settings")
@@ -26,6 +34,12 @@ import java.time.LocalDateTime;
 @EntityListeners(AuditingEntityListener.class)
 public class UserSettings {
 
+    /** Comprimento maximo permitido para chaves e tokens. */
+    public static final int API_SECRET_MAX_LENGTH = 500;
+
+    /** Comprimento maximo permitido para numeros de WhatsApp. */
+    public static final int WHATSAPP_NUMBER_MAX_LENGTH = 50;
+
     /**
      * Identificador único das configurações.
      */
@@ -34,7 +48,7 @@ public class UserSettings {
     private Long id;
 
     /**
-     * Usuário proprietário destas configurações.
+    * Usuario proprietario destas configuracoes.
      * Relacionamento One-to-One com User.
      */
     @OneToOne
@@ -42,38 +56,42 @@ public class UserSettings {
     private User user;
 
     /**
-     * Chave de API da OpenAI (criptografada).
-     * Usada para análises com IA.
+    * Chave de API da OpenAI (criptografada).
+    * Usada para analises com IA.
      */
-    @Column(name = "openai_api_key", length = 500)
+    @Column(name = "openai_api_key", length = API_SECRET_MAX_LENGTH)
     private String openaiApiKey;
 
     /**
      * Account SID do Twilio (criptografado).
      * Usado para envio de mensagens WhatsApp.
      */
-    @Column(name = "twilio_account_sid", length = 500)
+    @Column(name = "twilio_account_sid", length = API_SECRET_MAX_LENGTH)
     private String twilioAccountSid;
 
     /**
      * Auth Token do Twilio (criptografado).
-     * Usado para autenticação no serviço Twilio.
+     * Usado para autenticacao no servico Twilio.
      */
-    @Column(name = "twilio_auth_token", length = 500)
+    @Column(name = "twilio_auth_token", length = API_SECRET_MAX_LENGTH)
     private String twilioAuthToken;
 
     /**
-     * Número WhatsApp do Twilio.
+     * Numero WhatsApp do Twilio.
      * Formato: whatsapp:+14155238886
      */
-    @Column(name = "twilio_whatsapp_number", length = 50)
+    @Column(
+        name = "twilio_whatsapp_number",
+        length = WHATSAPP_NUMBER_MAX_LENGTH)
     private String twilioWhatsappNumber;
 
     /**
-     * Número de WhatsApp do usuário para receber notificações.
+     * Numero de WhatsApp do usuario para receber notificacoes.
      * Formato: whatsapp:+5511999999999
      */
-    @Column(name = "user_whatsapp_number", length = 50)
+    @Column(
+        name = "user_whatsapp_number",
+        length = WHATSAPP_NUMBER_MAX_LENGTH)
     private String userWhatsappNumber;
 
     /**

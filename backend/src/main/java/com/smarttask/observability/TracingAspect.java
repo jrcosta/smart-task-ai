@@ -1,5 +1,7 @@
 package com.smarttask.observability;
 
+import java.lang.reflect.Method;
+
 import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.api.trace.StatusCode;
 import io.opentelemetry.api.trace.Tracer;
@@ -12,11 +14,9 @@ import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.stereotype.Component;
 
-import java.lang.reflect.Method;
-
 /**
- * Aspecto que intercepta métodos anotados com @Traced e cria spans do OpenTelemetry
- * automaticamente, capturando informações sobre a execução.
+ * Aspecto que intercepta metodos anotados com {@link Traced} e cria spans do
+ * OpenTelemetry automaticamente, registrando atributos relevantes da execucao.
  */
 @Aspect
 @Component
@@ -24,40 +24,42 @@ import java.lang.reflect.Method;
 @Slf4j
 public class TracingAspect {
 
+    /** Cliente OpenTelemetry responsavel pela criacao de spans. */
     private final Tracer tracer;
 
+    /**
+     * Executa o metodo anotado dentro de um span OpenTelemetry, capturando
+     * atributos configurados pela anotacao {@link Traced}.
+     *
+     * @param joinPoint ponto de juncao fornecido pelo AspectJ
+     * @return resultado do metodo original
+     * @throws Throwable propagado caso o metodo interceptado lance excecao
+     */
     @Around("@annotation(com.smarttask.observability.Traced)")
-    public Object traceMethod(ProceedingJoinPoint joinPoint) throws Throwable {
-        MethodSignature signature = (MethodSignature) joinPoint.getSignature();
-        Method method = signature.getMethod();
-        Traced traced = method.getAnnotation(Traced.class);
+    public Object traceMethod(final ProceedingJoinPoint joinPoint)
+            throws Throwable {
+        final MethodSignature signature =
+                (MethodSignature) joinPoint.getSignature();
+        final Method method = signature.getMethod();
+        final Traced traced = method.getAnnotation(Traced.class);
 
-        String spanName = traced.value().isEmpty() 
-                ? signature.getDeclaringTypeName() + "." + signature.getName()
+        final String spanName = traced.value().isEmpty()
+                ? signature.getDeclaringTypeName() + "."
+                + signature.getName()
                 : traced.value();
 
-        Span span = tracer.spanBuilder(spanName).startSpan();
+        final Span span = tracer.spanBuilder(spanName).startSpan();
 
         try (Scope scope = span.makeCurrent()) {
-            // Adiciona atributos do método
             span.setAttribute("component", signature.getDeclaringTypeName());
             span.setAttribute("method", signature.getName());
 
-            // Captura parâmetros se solicitado
             if (traced.captureParameters()) {
-                String[] parameterNames = signature.getParameterNames();
-                Object[] args = joinPoint.getArgs();
-                for (int i = 0; i < parameterNames.length && i < args.length; i++) {
-                    if (args[i] != null) {
-                        span.setAttribute("param." + parameterNames[i], args[i].toString());
-                    }
-                }
+                captureParameters(joinPoint, signature, span);
             }
 
-            // Executa o método
-            Object result = joinPoint.proceed();
+            final Object result = joinPoint.proceed();
 
-            // Captura resultado se solicitado
             if (traced.captureResult() && result != null) {
                 span.setAttribute("result", result.toString());
             }
@@ -65,13 +67,33 @@ public class TracingAspect {
             span.setStatus(StatusCode.OK);
             return result;
 
-        } catch (Throwable t) {
-            span.setStatus(StatusCode.ERROR, t.getMessage());
-            span.recordException(t);
-            log.error("Erro durante execução de método rastreado: {}", spanName, t);
-            throw t;
+        } catch (Throwable throwable) {
+            span.setStatus(StatusCode.ERROR, throwable.getMessage());
+            span.recordException(throwable);
+            log.error(
+                    "Erro durante execucao de metodo rastreado: {}",
+                    spanName,
+                    throwable);
+            throw throwable;
         } finally {
             span.end();
+        }
+    }
+
+    private void captureParameters(
+            final ProceedingJoinPoint joinPoint,
+            final MethodSignature signature,
+            final Span span) {
+        final String[] parameterNames = signature.getParameterNames();
+        final Object[] args = joinPoint.getArgs();
+    for (int index = 0;
+        index < parameterNames.length && index < args.length;
+        index++) {
+            if (args[index] != null) {
+                span.setAttribute(
+                        "param." + parameterNames[index],
+                        args[index].toString());
+            }
         }
     }
 }

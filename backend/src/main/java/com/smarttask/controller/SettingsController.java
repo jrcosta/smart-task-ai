@@ -10,53 +10,83 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
- * Expõe endpoints REST para gerenciamento de configurações de usuário,
- * incluindo chaves de API para integração com serviços externos.
+ * Expoe endpoints REST para gerenciamento de configuracoes de usuario.
+ * Inclui chaves de API para integracoes com servicos externos.
  */
 @RestController
 @RequestMapping("/settings")
 @RequiredArgsConstructor
 @Slf4j
-@Tag(name = "Settings", description = "Gerenciamento de configurações do usuário")
+@Tag(
+        name = "Settings",
+        description = "Gerenciamento de configuracoes do "
+                + "usuario")
 @SecurityRequirement(name = "Bearer Authentication")
-public class SettingsController {
+public final class SettingsController {
 
+    /** Servico responsavel por persistir as configuracoes de usuario. */
     private final SettingsService settingsService;
+
+    /** Utilitario para extrair informacoes a partir de tokens JWT. */
     private final JwtTokenProvider jwtTokenProvider;
 
     /**
-     * Obtém as configurações do usuário autenticado.
+     * Obtem as configuracoes do usuario autenticado.
+     *
+     * @param token cabecalho Authorization contendo o token JWT
+     * @return configuracoes atualmente persistidas para o usuario
      */
     @GetMapping
-    @Operation(summary = "Obter configurações", description = "Retorna as configurações do usuário autenticado")
-    public ResponseEntity<SettingsResponse> getUserSettings(@RequestHeader("Authorization") String token) {
-        Long userId = getUserIdFromToken(token);
-        SettingsResponse response = settingsService.getUserSettings(userId);
+    @Operation(summary = "Obter configuracoes",
+            description = "Retorna as configuracoes do usuario autenticado")
+    public ResponseEntity<SettingsResponse> getUserSettings(
+            @RequestHeader("Authorization") final String token) {
+        final Long userId = getUserIdFromToken(token);
+    final SettingsResponse response =
+        settingsService.getUserSettings(userId);
         return ResponseEntity.ok(response);
     }
 
     /**
-     * Atualiza as configurações do usuário autenticado.
+     * Atualiza as configuracoes do usuario autenticado.
+     *
+     * @param token cabecalho Authorization contendo o token JWT
+     * @param request dados de configuracao enviados pelo frontend
+     * @return configuracoes atualizadas apos a persistencia
      */
     @PutMapping
-    @Operation(summary = "Atualizar configurações", description = "Atualiza as chaves de API e outras configurações")
+    @Operation(summary = "Atualizar configuracoes",
+            description = "Atualiza as chaves de API e outras "
+                    + "configuracoes")
     public ResponseEntity<SettingsResponse> updateUserSettings(
-            @RequestHeader("Authorization") String token,
-            @RequestBody SettingsRequest request) {
-        Long userId = getUserIdFromToken(token);
-        log.info("Atualizando configurações para o usuário {}", userId);
-        SettingsResponse response = settingsService.updateUserSettings(userId, request);
-        return ResponseEntity.ok(response);
+            @RequestHeader("Authorization") final String token,
+            @RequestBody final SettingsRequest request) {
+    final Long userId = getUserIdFromToken(token);
+    log.info(
+        "Atualizando configuracoes para o usuario {}",
+        userId);
+    final SettingsResponse response = settingsService.updateUserSettings(
+        userId,
+        request);
+    return ResponseEntity.ok(response);
     }
 
     /**
-     * Extrai o ID do usuário a partir do token JWT.
+     * Extrai o ID do usuario a partir do token JWT.
+     *
+     * @param token valor completo do cabecalho Authorization
+     * @return identificador do usuario autenticado
      */
-    private Long getUserIdFromToken(String token) {
-        String jwt = token.replace("Bearer ", "");
+    private Long getUserIdFromToken(final String token) {
+        final String jwt = token.replace("Bearer ", "");
         return jwtTokenProvider.getUserIdFromToken(jwt);
     }
 }

@@ -20,68 +20,122 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import java.util.Arrays;
 import java.util.List;
 
 /**
- * Configura as regras de segurança HTTP, autenticação e CORS da aplicação,
- * habilitando autenticação JWT sem estado e integração com {@link CustomUserDetailsService}.
+ * Configura seguranca HTTP, autenticacao e CORS da aplicacao com JWT sem
+ * estado, integrando-se ao {@link CustomUserDetailsService} para carregar
+ * credenciais.
  */
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
 @RequiredArgsConstructor
-public class SecurityConfig {
+public final class SecurityConfig {
 
+    /** Servico responsavel por carregar usuarios autenticaveis. */
     private final CustomUserDetailsService userDetailsService;
+
+    /** Filtro que valida tokens JWT em cada requisicao. */
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
+    /**
+     * Configura o codificador de senhas padrao (BCrypt).
+     *
+     * @return implementacao de {@link PasswordEncoder}
+     */
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
+    /**
+     * Configura o provedor de autenticacao baseado em banco de dados.
+     *
+     * @return provedor com servico de usuarios e encoder registrados
+     */
     @Bean
     public DaoAuthenticationProvider authenticationProvider() {
-        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
+        final DaoAuthenticationProvider authProvider =
+                new DaoAuthenticationProvider();
         authProvider.setUserDetailsService(userDetailsService);
         authProvider.setPasswordEncoder(passwordEncoder());
         return authProvider;
     }
 
+    /**
+     * Expoe o gerenciador de autenticacao do Spring Security.
+     *
+     * @param authConfig configuracao compartilhada de autenticacao
+     * @return instancia configurada de {@link AuthenticationManager}
+     * @throws Exception quando a resolucao do gerenciador falha
+     */
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
+    public AuthenticationManager authenticationManager(
+            final AuthenticationConfiguration authConfig) throws Exception {
         return authConfig.getAuthenticationManager();
     }
 
+    /**
+     * Define a cadeia de filtros HTTP com JWT sem estado e CORS permissivo.
+     *
+     * @param http construtor de configuracoes HTTP
+     * @return cadeia de filtros configurada
+     * @throws Exception quando a construcao falha
+     */
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http
-            .csrf(csrf -> csrf.disable())
-            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-            .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/auth/**", "/h2-console/**", "/actuator/**").permitAll()
-                .anyRequest().authenticated()
-            )
-            .authenticationProvider(authenticationProvider())
-            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
-
-        // Para H2 Console
-        http.headers(headers -> headers.frameOptions(frame -> frame.sameOrigin()));
+    public SecurityFilterChain filterChain(
+            final HttpSecurity http)
+            throws Exception {
+        http.csrf(configurer -> configurer.disable());
+        http.cors(configurer ->
+                configurer.configurationSource(
+                        corsConfigurationSource()));
+        http.sessionManagement(configurer ->
+                configurer.sessionCreationPolicy(
+                        SessionCreationPolicy.STATELESS));
+        http.authorizeHttpRequests(registry ->
+                registry.requestMatchers(
+                        "/auth/**",
+                        "/h2-console/**",
+                        "/actuator/**")
+                .permitAll()
+                .anyRequest()
+                .authenticated());
+        http.authenticationProvider(
+                authenticationProvider());
+        http.addFilterBefore(
+                jwtAuthenticationFilter,
+                UsernamePasswordAuthenticationFilter.class);
+        http.headers(headers ->
+                headers.frameOptions(frame ->
+                        frame.sameOrigin()));
 
         return http.build();
     }
 
+    /**
+     * Configura o CORS para liberar o acesso do frontend local.
+     *
+     * @return fonte de configuracoes CORS registrada
+     */
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("http://localhost:3000", "http://localhost:5173"));
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        configuration.setAllowedHeaders(Arrays.asList("*"));
+        final CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowedOrigins(List.of(
+                "http://localhost:3000",
+                "http://localhost:5173"));
+        configuration.setAllowedMethods(List.of(
+                "GET",
+                "POST",
+                "PUT",
+                "DELETE",
+                "OPTIONS"));
+        configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true);
-        
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+
+        final UrlBasedCorsConfigurationSource source =
+                new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;
     }

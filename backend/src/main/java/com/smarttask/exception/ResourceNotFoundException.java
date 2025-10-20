@@ -1,10 +1,17 @@
 package com.smarttask.exception;
 
 /**
- * Exceção lançada quando um recurso solicitado não é encontrado no sistema.
+ * Excecao lancada quando um recurso solicitado nao e encontrado no sistema.
  */
-public class ResourceNotFoundException extends RuntimeException {
-    public ResourceNotFoundException(String message) {
+public final class ResourceNotFoundException extends RuntimeException {
+
+    /**
+    * Constroi a excecao com a mensagem exposta para o consumidor da API.
+     *
+    * @param message texto explicativo informando qual recurso nao foi
+    *                encontrado
+     */
+    public ResourceNotFoundException(final String message) {
         super(message);
     }
 }

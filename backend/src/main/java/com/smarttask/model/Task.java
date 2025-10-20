@@ -1,6 +1,25 @@
 package com.smarttask.model;
 
-import jakarta.persistence.*;
+import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
+
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.CollectionTable;
+import jakarta.persistence.Column;
+import jakarta.persistence.ElementCollection;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -11,15 +30,11 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.Set;
-
 /**
  * Entidade JPA que representa uma tarefa do sistema Smart Task Manager.
- * 
- * <p>Uma tarefa contém informações sobre uma atividade a ser realizada por um usuário,
- * incluindo:</p>
+ *
+ * <p>Uma tarefa contem informacoes sobre uma atividade a ser realizada por um
+ * usuario, incluindo:</p>
  * <ul>
  *   <li>Título e descrição detalhada</li>
  *   <li>Status (TODO, IN_PROGRESS, COMPLETED, CANCELLED)</li>
@@ -30,16 +45,16 @@ import java.util.Set;
  *   <li>Sugestões de IA para prioridade e análise</li>
  *   <li>Subtarefas associadas</li>
  * </ul>
- * 
+ *
  * <p>A entidade mantém relacionamento com:</p>
  * <ul>
  *   <li>{@link User} - Proprietário da tarefa</li>
  *   <li>{@link Task} - Tarefas pai (para subtarefas)</li>
  * </ul>
- * 
+ *
  * <p>Usa {@link AuditingEntityListener} para rastreamento automático de datas
  * de criação e modificação.</p>
- * 
+ *
  * @author Smart Task AI Team
  * @version 1.0
  * @since 2025-10
@@ -53,6 +68,12 @@ import java.util.Set;
 @EntityListeners(AuditingEntityListener.class)
 public class Task {
 
+    /** Tamanho mínimo permitido para o título da tarefa. */
+    public static final int TITLE_MIN_LENGTH = 3;
+
+    /** Tamanho máximo permitido para o título da tarefa. */
+    public static final int TITLE_MAX_LENGTH = 200;
+
     /**
      * Identificador único da tarefa.
      */
@@ -65,7 +86,7 @@ public class Task {
      * Deve ter entre 3 e 200 caracteres.
      */
     @NotBlank
-    @Size(min = 3, max = 200)
+    @Size(min = TITLE_MIN_LENGTH, max = TITLE_MAX_LENGTH)
     @Column(nullable = false)
     private String title;
 
@@ -129,7 +150,9 @@ public class Task {
      * Permite múltiplas tags por tarefa.
      */
     @ElementCollection
-    @CollectionTable(name = "task_tags", joinColumns = @JoinColumn(name = "task_id"))
+    @CollectionTable(
+        name = "task_tags",
+        joinColumns = @JoinColumn(name = "task_id"))
     @Column(name = "tag")
     @Builder.Default
     private Set<String> tags = new HashSet<>();
@@ -154,7 +177,10 @@ public class Task {
      * Conjunto de subtarefas associadas a esta tarefa.
      * Deletadas em cascata quando a tarefa pai é removida.
      */
-    @OneToMany(mappedBy = "parentTask", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(
+        mappedBy = "parentTask",
+        cascade = CascadeType.ALL,
+        orphanRemoval = true)
     @Builder.Default
     private Set<Task> subtasks = new HashSet<>();
 
@@ -192,17 +218,25 @@ public class Task {
      * Enumeração dos status possíveis para uma tarefa.
      */
     public enum TaskStatus {
-        /** Tarefa ainda não iniciada */
+        /** Tarefa ainda não iniciada. */
         TODO,
-        /** Tarefa em andamento */
+        /** Tarefa em andamento. */
         IN_PROGRESS,
-        /** Tarefa concluída com sucesso */
+        /** Tarefa concluída com sucesso. */
         COMPLETED,
-        /** Tarefa cancelada */
+        /** Tarefa cancelada. */
         CANCELLED
     }
 
+    /** Enumeração das prioridades disponíveis para as tarefas. */
     public enum TaskPriority {
-        LOW, MEDIUM, HIGH, URGENT
+        /** Prioridade baixa. */
+        LOW,
+        /** Prioridade média. */
+        MEDIUM,
+        /** Prioridade alta. */
+        HIGH,
+        /** Prioridade urgente. */
+        URGENT
     }
 }

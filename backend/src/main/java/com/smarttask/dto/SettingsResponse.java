@@ -6,37 +6,37 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * DTO para resposta com as configurações do usuário.
- * Por segurança, não retorna os valores reais das chaves, apenas indica se estão configuradas.
+ * DTO para resposta com as configuracoes do usuario.
+ * Por seguranca, nao retorna os valores reais; apenas indica se estao ativos.
  */
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class SettingsResponse {
-    
+
     /**
-     * Indica se a chave OpenAI está configurada.
+     * Indica se a chave OpenAI esta configurada.
      */
     private boolean openaiConfigured;
-    
+
     /**
-     * Indica se as credenciais Twilio estão configuradas.
+     * Indica se as credenciais Twilio estao configuradas.
      */
     private boolean twilioConfigured;
-    
+
     /**
-     * Número WhatsApp do Twilio (parcialmente mascarado por segurança).
+     * Numero WhatsApp do Twilio (mascarado por seguranca).
      */
     private String twilioWhatsappNumber;
-    
+
     /**
-     * Número WhatsApp do usuário (parcialmente mascarado por segurança).
+     * Numero WhatsApp do usuario (mascarado por seguranca).
      */
     private String userWhatsappNumber;
-    
+
     /**
-     * Mensagem informativa sobre o estado das configurações.
+     * Mensagem informativa sobre o estado das configuracoes.
      */
     private String message;
 }

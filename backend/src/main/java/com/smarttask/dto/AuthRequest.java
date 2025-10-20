@@ -12,10 +12,11 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AuthRequest {
-    
+    /** Nome de usuário informado no processo de login. */
     @NotBlank
     private String username;
-    
+
+    /** Senha em texto plano submetida para autenticação. */
     @NotBlank
     private String password;
 }
