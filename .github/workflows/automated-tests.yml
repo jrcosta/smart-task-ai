@@ -18,13 +18,13 @@ jobs:
     
     services:
       postgres:
-        image: postgres:15-alpine
+        image: postgres:15
         env:
-          POSTGRES_DB: smarttask_test
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: smart_task_test
         options: >-
-          --health-cmd pg_isready
+          --health-cmd "pg_isready -U postgres"
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
@@ -34,17 +34,22 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       
-      - name: Setup JDK 25
-        uses: actions/setup-java@v4
+      - name: Set up JDK 25
+        uses: actions/setup-java@v3
         with:
-          java-version: '25'
           distribution: 'temurin'
+          java-version: '25'
           cache: maven
+      
+      - name: Verify Java and Maven
+        run: |
+          java -version
+          mvn -v
       
       - name: Run Backend Tests
         run: cd backend && mvn clean verify
         env:
-          SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/smarttask_test
+          SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/smart_task_test
           SPRING_DATASOURCE_USERNAME: postgres
           SPRING_DATASOURCE_PASSWORD: postgres
       
@@ -119,12 +124,17 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
       
-      - name: Setup JDK 25
-        uses: actions/setup-java@v4
+      - name: Set up JDK 25
+        uses: actions/setup-java@v3
         with:
-          java-version: '25'
           distribution: 'temurin'
+          java-version: '25'
           cache: maven
+      
+      - name: Verify Java and Maven
+        run: |
+          java -version
+          mvn -v
       
       - name: Setup Node.js
         uses: actions/setup-node@v4

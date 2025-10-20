@@ -205,8 +205,8 @@
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <version>3.6.3</version>
                 <configuration>
-                    <source>21</source>
-                    <javadocVersion>21</javadocVersion>
+                    <source>25</source>
+                    <javadocVersion>25</javadocVersion>
                     <encoding>UTF-8</encoding>
                     <failOnError>false</failOnError>
                     <doclint>none</doclint>
