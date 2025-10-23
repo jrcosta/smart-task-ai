@@ -1,5 +1,12 @@
 # Changelog
 
+## [Unreleased]
+
+### 🔧 Melhorias Técnicas
+- Atualização do Spring Boot para 3.5.2 (compatibilidade com Java 25 e melhorias de performance)
+- Atualização do SpringDoc OpenAPI para 2.6.0 para compatibilidade com Spring Boot 3.5.x
+- Configuração do compilador Maven ajustada para permitir override do `maven.compiler.release` via `-Dmaven.compiler.release` (padrão permanece 25)
+
 ## [1.1.0] - 2025-10-05
 
 ### ✨ Novidades
