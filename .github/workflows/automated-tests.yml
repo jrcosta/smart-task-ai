@@ -42,15 +42,18 @@ jobs:
           cache: maven
       
       - name: Run Backend Tests
-        run: cd backend && mvn clean verify
+        run: cd backend && mvn -B clean verify
         env:
           SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/smarttask_test
           SPRING_DATASOURCE_USERNAME: postgres
           SPRING_DATASOURCE_PASSWORD: postgres
       
+      - name: Generate JaCoCo Coverage
+        run: cd backend && mvn -B -q jacoco:report || true
+      
       - name: Generate Test Report
         if: always()
-        run: cd backend && mvn surefire-report:report
+        run: cd backend && mvn -B surefire-report:report || true
       
       - name: Upload Test Results
         if: always()
@@ -214,7 +217,7 @@ jobs:
       - name: Upload All Coverage
         uses: codecov/codecov-action@v3
         with:
-          files: ./backend-coverage/index.xml,./frontend-coverage/coverage-final.json
+          files: ./backend-coverage/jacoco.xml,./frontend-coverage/coverage-final.json
           flags: unittests
           name: codecov-umbrella
         continue-on-error: true
