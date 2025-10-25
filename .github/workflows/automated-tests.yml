@@ -112,7 +112,7 @@ jobs:
       - name: Install Dependencies
         run: |
           cd frontend
-          npm ci || npm install --legacy-peer-deps --no-fund --no-audit
+          npm install --legacy-peer-deps --no-fund --no-audit
       
       - name: Lint Frontend (if configured)
         run: |
@@ -180,7 +180,7 @@ jobs:
       - name: Install Frontend Dependencies
         run: |
           cd frontend
-          npm ci || npm install --legacy-peer-deps --no-fund --no-audit
+          npm install --legacy-peer-deps --no-fund --no-audit
       
       - name: Build Frontend
         run: |
