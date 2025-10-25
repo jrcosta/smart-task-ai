@@ -99,7 +99,7 @@ services:
   # ===== BACKEND - SPRING BOOT =====
   backend:
     build:
-      context: ./backend
+      context: ../backend
       dockerfile: Dockerfile
     container_name: smarttask-backend
     environment:
@@ -131,7 +131,7 @@ services:
   # ===== FRONTEND - REACT =====
   frontend:
     build:
-      context: ./frontend
+      context: ../frontend
       dockerfile: Dockerfile
     container_name: smarttask-frontend
     ports:
