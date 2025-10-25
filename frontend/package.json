@@ -6,6 +6,7 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
+    "lint": "npx eslint . --ext .ts,.tsx,.js,.jsx || true",
     "docs": "typedoc --options typedoc.json"
   },
   "dependencies": {
