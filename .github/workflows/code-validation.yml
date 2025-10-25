@@ -86,8 +86,14 @@ jobs:
           cache-dependency-path: 'frontend/package-lock.json'
       
       # Install Dependencies
+      # NOTA: usando --legacy-peer-deps devido a conflito de peer dependency entre React 19.1.1
+      # e @tanstack/react-query@^4.24.0 (que requer React ^16/17/18). Esta é uma solução
+      # temporária para manter CI funcionando sem fazer downgrade do React.
+      # TODO: Verificar se @tanstack/react-query lançou versão com suporte a React 19, ou
+      # considerar migração para solução de data-fetching compatível. Executar `npm outdated`
+      # no diretório frontend e tentar upgrade de dependências localmente.
       - name: Install Dependencies
-        run: cd frontend && npm ci
+        run: cd frontend && npm ci --legacy-peer-deps
       
       # ESLint (Linting)
       - name: Run ESLint
