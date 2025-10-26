@@ -1,0 +1,73 @@
+name: Sync Wiki
+
+on:
+  push:
+    branches:
+      - master
+      - main
+    paths:
+      - 'wiki/**'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  sync-wiki:
+    name: Sincronizar Wiki com GitHub Wiki
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repositório
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Configurar Git
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Clonar repositório wiki
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git clone "https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}.wiki.git" /tmp/wiki
+
+      - name: Sincronizar arquivos
+        run: |
+          # Copiar arquivos da wiki para o repositório wiki (inclui arquivos ocultos)
+          if [ -n "$(find wiki/ -maxdepth 1 -type f -print -quit 2>/dev/null)" ]; then
+            cp -r wiki/. /tmp/wiki/
+          else
+            echo "⚠️ Pasta wiki/ está vazia ou não contém arquivos"
+            exit 1
+          fi
+
+      - name: Commit e Push
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          cd /tmp/wiki
+
+          # Verificar se há mudanças
+          if [ -z "$(git status --porcelain)" ]; then
+            echo "✅ Nenhuma mudança detectada na wiki"
+            exit 0
+          fi
+
+          # Adicionar e commitar
+          git add .
+          git commit -m "Atualizar wiki (sincronizado do repositório principal)"
+
+          # Detectar branch padrão usando awk (mais robusto)
+          DEFAULT_BRANCH=$(git remote show origin 2>/dev/null | grep 'HEAD branch' | awk '{print $NF}')
+          if [ -z "$DEFAULT_BRANCH" ] || ! git rev-parse --verify "origin/$DEFAULT_BRANCH" >/dev/null 2>&1; then
+            DEFAULT_BRANCH="master"
+          fi
+
+          echo "📤 Fazendo push para branch: $DEFAULT_BRANCH"
+          git push origin "$DEFAULT_BRANCH"
+
+          echo "✅ Wiki sincronizada com sucesso!"
+          echo "🌐 Acesse em: https://github.com/${{ github.repository }}/wiki"

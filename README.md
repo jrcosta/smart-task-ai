@@ -10,13 +10,19 @@ Um gerenciador de tarefas inteligente com integração de IA, desenvolvido com *
 
 ## 📚 Documentação Completa
 
-**📖 [Acesse a Wiki Completa](wiki/Home.md)** - Documentação abrangente com guias, tutoriais e referências
+**📖 [Acesse a Wiki do GitHub](https://github.com/jrcosta/smart-task-ai/wiki)** - Documentação abrangente com guias, tutoriais e referências
 
-- 🚀 [Getting Started](wiki/Getting-Started.md) - Comece em 5 minutos
-- ✨ [Features](wiki/Features.md) - Todas as funcionalidades
-- 📖 [Usage Guide](wiki/Usage-Guide.md) - Guia completo de uso
-- ❓ [FAQ](wiki/FAQ.md) - Perguntas frequentes
-- 🗺️ [Roadmap](wiki/Roadmap.md) - Próximas funcionalidades
+### Páginas Principais da Wiki
+
+- 🚀 [Getting Started](https://github.com/jrcosta/smart-task-ai/wiki/Getting-Started) - Comece em 5 minutos
+- ✨ [Features](https://github.com/jrcosta/smart-task-ai/wiki/Features) - Todas as funcionalidades
+- 📖 [Usage Guide](https://github.com/jrcosta/smart-task-ai/wiki/Usage-Guide) - Guia completo de uso
+- 🏗️ [Architecture](https://github.com/jrcosta/smart-task-ai/wiki/Architecture) - Arquitetura do sistema
+- ❓ [FAQ](https://github.com/jrcosta/smart-task-ai/wiki/FAQ) - Perguntas frequentes
+- 🔧 [Troubleshooting](https://github.com/jrcosta/smart-task-ai/wiki/Troubleshooting) - Resolução de problemas
+- 🗺️ [Roadmap](https://github.com/jrcosta/smart-task-ai/wiki/Roadmap) - Próximas funcionalidades
+
+> **Nota**: A wiki é sincronizada automaticamente via GitHub Actions sempre que houver alterações na pasta `wiki/`. Veja [docs/WIKI_SYNC.md](docs/WIKI_SYNC.md) para mais detalhes.
 
 ## ✨ Funcionalidades
 

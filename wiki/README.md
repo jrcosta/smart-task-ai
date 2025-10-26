@@ -2,6 +2,17 @@
 
 Bem-vindo à documentação completa do Smart Task AI em formato wiki!
 
+## 🌐 Acesse a Wiki Online
+
+**📖 [Acesse a Wiki Oficial no GitHub](https://github.com/jrcosta/smart-task-ai/wiki)**
+
+Esta pasta é sincronizada automaticamente com a Wiki do GitHub. Você pode:
+- **Ler online**: Acesse a Wiki diretamente no GitHub para melhor navegação
+- **Editar aqui**: Faça mudanças nesta pasta e serão sincronizadas automaticamente
+- **Colaborar**: Contribua via Pull Requests editando os arquivos `.md`
+
+> **Nota**: A sincronização é automática via GitHub Actions. Veja [docs/WIKI_SYNC.md](../docs/WIKI_SYNC.md) para detalhes.
+
 ## 🎯 Sobre esta Wiki
 
 Esta wiki fornece documentação abrangente e organizada para usuários, desenvolvedores e contribuidores do Smart Task AI. Aqui você encontra desde guias de início rápido até documentação técnica detalhada.
