@@ -36,8 +36,13 @@ jobs:
 
       - name: Sincronizar arquivos
         run: |
-          # Copiar arquivos da wiki para o repositório wiki
-          cp -r wiki/* /tmp/wiki/
+          # Copiar arquivos da wiki para o repositório wiki (inclui arquivos ocultos)
+          if [ -n "$(ls -A wiki/)" ]; then
+            cp -r wiki/. /tmp/wiki/
+          else
+            echo "⚠️ Pasta wiki/ está vazia"
+            exit 1
+          fi
 
       - name: Commit e Push
         env:
@@ -55,8 +60,14 @@ jobs:
           git add .
           git commit -m "Atualizar wiki (sincronizado do repositório principal)"
 
-          # Push para o repositório wiki
-          git push origin master || git push origin main
+          # Detectar branch padrão e fazer push
+          DEFAULT_BRANCH=$(git remote show origin | grep 'HEAD branch' | cut -d' ' -f5)
+          if [ -z "$DEFAULT_BRANCH" ]; then
+            DEFAULT_BRANCH="master"
+          fi
+
+          echo "📤 Fazendo push para branch: $DEFAULT_BRANCH"
+          git push origin "$DEFAULT_BRANCH"
 
           echo "✅ Wiki sincronizada com sucesso!"
           echo "🌐 Acesse em: https://github.com/${{ github.repository }}/wiki"

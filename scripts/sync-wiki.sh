@@ -36,7 +36,18 @@ fi
 
 # Copiar arquivos da wiki
 echo "📋 Copiando arquivos da wiki..."
-cp -r "$(git rev-parse --show-toplevel)/$WIKI_DIR"/* .
+REPO_ROOT="$(git rev-parse --show-toplevel)"
+
+# Verificar se há arquivos para copiar
+if [ -z "$(ls -A "$REPO_ROOT/$WIKI_DIR")" ]; then
+    echo "❌ Erro: Pasta wiki/ está vazia"
+    cd - > /dev/null
+    rm -rf "$TEMP_DIR"
+    exit 1
+fi
+
+# Copiar todos os arquivos (incluindo ocultos)
+cp -r "$REPO_ROOT/$WIKI_DIR"/. .
 
 # Verificar se há mudanças
 if [ -z "$(git status --porcelain)" ]; then
@@ -51,9 +62,13 @@ echo "💾 Commitando mudanças..."
 git add .
 git commit -m "Atualizar wiki do repositório (sincronizado em $(date '+%Y-%m-%d %H:%M:%S'))"
 
+# Detectar branch padrão
+echo "📤 Detectando branch padrão..."
+DEFAULT_BRANCH=$(git remote show origin 2>/dev/null | grep 'HEAD branch' | cut -d' ' -f5 || echo "master")
+echo "📤 Enviando para branch: $DEFAULT_BRANCH"
+
 # Push para o repositório wiki
-echo "📤 Enviando para GitHub Wiki..."
-if git push origin master 2>/dev/null || git push origin main 2>/dev/null; then
+if git push origin "$DEFAULT_BRANCH"; then
     echo "✅ Wiki sincronizada com sucesso!"
 else
     echo "❌ Erro ao enviar para o repositório wiki."
