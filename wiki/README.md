@@ -60,14 +60,14 @@ Esta wiki fornece documentação abrangente e organizada para usuários, desenvo
 | [Usage Guide](Usage-Guide.md) | ✅ Completo | Guia detalhado de uso |
 | [Roadmap](Roadmap.md) | ✅ Completo | Plano de futuras features |
 | [FAQ](FAQ.md) | ✅ Completo | Perguntas frequentes |
+| [Architecture](Architecture.md) | ✅ Completo | Arquitetura técnica |
+| [Troubleshooting](Troubleshooting.md) | ✅ Completo | Solução de problemas |
 | Quick Start Tutorial | 🚧 Em breve | Tutorial prático |
 | Configuration | 🚧 Em breve | Configurações avançadas |
 | Development Guide | 🚧 Em breve | Setup para desenvolvedores |
-| Architecture | 🚧 Em breve | Arquitetura técnica |
 | API Documentation | 🚧 Em breve | Referência da API REST |
 | Contributing | 🚧 Em breve | Guia de contribuição |
 | Deployment | 🚧 Em breve | Deploy em produção |
-| Troubleshooting | 🚧 Em breve | Solução de problemas |
 | Security | 🚧 Em breve | Segurança e melhores práticas |
 
 ## 🔍 Como Usar Esta Wiki
@@ -177,9 +177,10 @@ Abra uma [issue](https://github.com/jrcosta/smart-task-ai/issues/new) com label 
 ## 📊 Status da Wiki
 
 ### Estatísticas
-- **Páginas Completas**: 6
-- **Páginas em Desenvolvimento**: 8
-- **Total de Palavras**: ~30.000
+- **Páginas Completas**: 9
+- **Páginas em Desenvolvimento**: 6
+- **Total de Palavras**: ~65.000
+- **Total de Caracteres**: ~120.000
 - **Última Atualização**: Outubro 2025
 
 ### Próximas Adições (Prioridade)
