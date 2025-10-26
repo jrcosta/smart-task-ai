@@ -87,7 +87,7 @@ public final class SecurityConfig {
     public SecurityFilterChain filterChain(
             final HttpSecurity http)
             throws Exception {
-        http.csrf(configurer -> configurer.disable());
+        // CSRF protection left enabled by default. Remove line below.
         http.cors(configurer ->
                 configurer.configurationSource(
                         corsConfigurationSource()));
