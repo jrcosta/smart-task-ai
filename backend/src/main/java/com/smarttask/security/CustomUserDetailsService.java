@@ -18,7 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Service
 @RequiredArgsConstructor
-public final class CustomUserDetailsService implements UserDetailsService {
+public class CustomUserDetailsService implements UserDetailsService {
 
     /** Formato base para mensagens de usuario nao encontrado. */
     private static final String USER_NOT_FOUND_MESSAGE =

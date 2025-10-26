@@ -23,7 +23,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @Slf4j
-public final class JwtTokenProvider {
+public class JwtTokenProvider {
 
     /** Segredo utilizado na assinatura HMAC dos tokens. */
     @Value("${jwt.secret}")

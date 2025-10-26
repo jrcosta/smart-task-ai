@@ -24,8 +24,6 @@
         <maven.compiler.target>25</maven.compiler.target>
         <maven.compiler.release>25</maven.compiler.release>
         <lombok.version>1.18.40</lombok.version>
-        <opentelemetry.version>1.32.0</opentelemetry.version>
-        <opentelemetry-instrumentation.version>1.32.0</opentelemetry-instrumentation.version>
         <sonar.organization>jrcosta</sonar.organization>
         <jacoco.version>0.8.13</jacoco.version>
         <!-- Garante JUnit 5 -->
@@ -121,41 +119,28 @@
         </dependency>
 
         
-        <!-- OpenTelemetry -->
+        <!-- OpenTelemetry API for custom instrumentation -->
         <dependency>
             <groupId>io.opentelemetry</groupId>
             <artifactId>opentelemetry-api</artifactId>
-            <version>${opentelemetry.version}</version>
-        </dependency>
-        
-        <dependency>
-            <groupId>io.opentelemetry</groupId>
-            <artifactId>opentelemetry-sdk</artifactId>
-            <version>${opentelemetry.version}</version>
-        </dependency>
-        
-        <dependency>
-            <groupId>io.opentelemetry</groupId>
-            <artifactId>opentelemetry-exporter-otlp</artifactId>
-            <version>${opentelemetry.version}</version>
-        </dependency>
-        
-        <dependency>
-            <groupId>io.opentelemetry</groupId>
-            <artifactId>opentelemetry-exporter-jaeger</artifactId>
-            <version>${opentelemetry.version}</version>
-        </dependency>
-        
-        <dependency>
-            <groupId>io.opentelemetry</groupId>
-            <artifactId>opentelemetry-sdk-extension-autoconfigure</artifactId>
-            <version>${opentelemetry.version}</version>
         </dependency>
         
         <!-- Micrometer for Prometheus -->
         <dependency>
             <groupId>io.micrometer</groupId>
             <artifactId>micrometer-registry-prometheus</artifactId>
+        </dependency>
+        
+        <!-- Micrometer Tracing Bridge for OpenTelemetry -->
+        <dependency>
+            <groupId>io.micrometer</groupId>
+            <artifactId>micrometer-tracing-bridge-otel</artifactId>
+        </dependency>
+        
+        <!-- OpenTelemetry Exporter for OTLP -->
+        <dependency>
+            <groupId>io.opentelemetry</groupId>
+            <artifactId>opentelemetry-exporter-otlp</artifactId>
         </dependency>
         
         <dependency>

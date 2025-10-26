@@ -55,20 +55,12 @@ twilio:
   auth-token: ${TWILIO_AUTH_TOKEN:}
   whatsapp-number: ${TWILIO_WHATSAPP_NUMBER:}
 
-# Configurações OpenTelemetry
-otel:
-  traces:
-    enabled: true
-  metrics:
-    enabled: true
-  exporter:
-    jaeger:
-      endpoint: ${OTEL_EXPORTER_JAEGER_ENDPOINT:http://localhost:14250}
-    otlp:
-      endpoint: ${OTEL_EXPORTER_OTLP_ENDPOINT:http://localhost:4317}
-
-# Configurações do Spring Boot Actuator
+# Configurações OpenTelemetry (via Spring Boot auto-configuration)
 management:
+  otlp:
+    tracing:
+      # Spring Boot 3.5 usa protocolo HTTP para OTLP por padrão (porta 4318), diferente do gRPC (porta 4317) usado em versões anteriores
+      endpoint: ${OTEL_EXPORTER_OTLP_ENDPOINT:http://localhost:4318/v1/traces}
   endpoints:
     web:
       exposure:

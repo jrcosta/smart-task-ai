@@ -19,7 +19,7 @@ import org.springframework.context.annotation.Configuration;
  * - OpenAPI YAML: http://localhost:8080/v3/api-docs.yaml
  */
 @Configuration
-public final class OpenApiConfig {
+public class OpenApiConfig {
 
     /** Descricao principal exibida na documentacao gerada. */
     private static final String API_DESCRIPTION =
