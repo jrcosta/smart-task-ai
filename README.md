@@ -8,6 +8,16 @@ Um gerenciador de tarefas inteligente com integração de IA, desenvolvido com *
 ![TypeScript](https://img.shields.io/badge/TypeScript-4.9-blue)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15-blue)
 
+## 📚 Documentação Completa
+
+**📖 [Acesse a Wiki Completa](wiki/Home.md)** - Documentação abrangente com guias, tutoriais e referências
+
+- 🚀 [Getting Started](wiki/Getting-Started.md) - Comece em 5 minutos
+- ✨ [Features](wiki/Features.md) - Todas as funcionalidades
+- 📖 [Usage Guide](wiki/Usage-Guide.md) - Guia completo de uso
+- ❓ [FAQ](wiki/FAQ.md) - Perguntas frequentes
+- 🗺️ [Roadmap](wiki/Roadmap.md) - Próximas funcionalidades
+
 ## ✨ Funcionalidades
 
 ### 🎯 Principais
