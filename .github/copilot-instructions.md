@@ -11,7 +11,7 @@ Este arquivo fornece instruções essenciais para agentes de IA acelerar o desen
 ```
 Frontend (React 19 + TypeScript + Vite)
          ↓ (Axios)
-Backend API (Java 25 + Spring Boot 3.2 + OpenTelemetry)
+Backend API (Java 25 + Spring Boot 3.5 + OpenTelemetry)
     ├─→ Database (PostgreSQL / H2)
     ├─→ OpenAI API (análise de tarefas)
     ├─→ Twilio API (notificações WhatsApp)
@@ -55,8 +55,9 @@ Backend API (Java 25 + Spring Boot 3.2 + OpenTelemetry)
   @Service
   public class TaskService {
     @Traced("TaskService.createTask")
-    public Task createTask(CreateTaskRequest req) {
-      // Logic here - span será criado automaticamente
+    public TaskResponse createTask(TaskRequest request,
+            UserPrincipal currentUser) {
+      // Lógica principal - span criado automaticamente
     }
   }
   ```
@@ -142,7 +143,7 @@ docker-compose -f infrastructure/docker-compose-observability.yml up -d  # Stack
 - **Review antes do merge**: Nunca fazer merge direto sem revisão
 
 ### Dependências
-- **Versões CONGELADAS**: Java 25, Spring Boot 3.2, React 19, Maven, Node 18+
+- **Versões CONGELADAS**: Java 25, Spring Boot 3.5, React 19, Maven, Node 18+
 - **Alterar versão REQUER** autorização explícita ("pode alterar a versão")
 - Verificar compatibilidade antes de qualquer update
 
@@ -172,7 +173,7 @@ docker-compose -f infrastructure/docker-compose-observability.yml up -d  # Stack
 
 1. **Frontend** dispara `useMutation(taskAPI.create({...}))`
 2. **api.ts interceptor** adiciona JWT header
-3. **Backend TaskController** recebe `CreateTaskRequest` DTO
+3. **Backend TaskController** recebe `TaskRequest` DTO
 4. **SecurityConfig** valida JWT automaticamente (Spring Security)
 5. **TaskService.createTask()** é executado com `@Traced` → AOP cria span
 6. **AIService.analyzeTask()** chamado se `OPENAI_API_KEY` configurado (ou mock)

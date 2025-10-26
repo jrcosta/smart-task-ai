@@ -331,7 +331,7 @@ npm run dev
 ### Quais tecnologias preciso conhecer?
 **Backend:**
 - Java 25
-- Spring Boot 3.2
+- Spring Boot 3.5
 - Spring Data JPA
 - Spring Security
 - Maven

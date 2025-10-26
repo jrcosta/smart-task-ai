@@ -1,7 +1,7 @@
 # 🏠 Bem-vindo à Wiki do Smart Task AI
 
 ![Java](https://img.shields.io/badge/Java-25-orange)
-![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.2-green)
+![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.5-green)
 ![React](https://img.shields.io/badge/React-19-blue)
 ![TypeScript](https://img.shields.io/badge/TypeScript-4.9-blue)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15-blue)
@@ -48,7 +48,7 @@ O **Smart Task AI** é um gerenciador de tarefas inteligente de código aberto q
 
 ### Tecnologias de Ponta
 ```
-Backend:  Java 25 + Spring Boot 3.2
+Backend:  Java 25 + Spring Boot 3.5
 Frontend: React 19 + TypeScript
 Database: PostgreSQL 15
 AI:       OpenAI GPT-4

@@ -87,7 +87,7 @@ Criar uma wiki abrangente para o repositório Smart Task AI, incluindo documenta
 - **Conteúdo**:
   - Visão geral da arquitetura
   - Frontend (React 19 + TypeScript)
-  - Backend (Spring Boot 3.2 + Java 25)
+  - Backend (Spring Boot 3.5 + Java 25)
   - Database schema e relacionamentos
   - Security (JWT)
   - Integração com IA (OpenAI)

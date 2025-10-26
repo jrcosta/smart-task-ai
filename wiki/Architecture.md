@@ -27,7 +27,7 @@ Smart Task AI é uma aplicação full-stack moderna com arquitetura em camadas, 
                             │ JWT Authentication
                             ↓
 ┌─────────────────────────────────────────────────────────────┐
-│              Backend (Spring Boot 3.2 + Java 25)            │
+│              Backend (Spring Boot 3.5 + Java 25)            │
 │                                                              │
 │  ┌──────────────────────────────────────────────────────┐  │
 │  │              Controllers (REST Endpoints)             │  │
@@ -225,14 +225,11 @@ backend/src/main/java/com/smarttask/
 │   └── NotificationRepository.java
 │
 ├── dto/                      # Data Transfer Objects
-│   ├── request/
-│   │   ├── CreateTaskRequest.java
-│   │   ├── LoginRequest.java
-│   │   └── ...
-│   └── response/
-│       ├── TaskResponse.java
-│       ├── AuthResponse.java
-│       └── ...
+│   ├── TaskRequest.java
+│   ├── TaskResponse.java
+│   ├── AuthRequest.java
+│   ├── AuthResponse.java
+│   └── ...
 │
 ├── security/                 # Segurança
 │   ├── JwtTokenProvider.java       # Geração e validação JWT
@@ -268,37 +265,37 @@ Database
 // 1. Controller recebe request
 @PostMapping("/tasks")
 public ResponseEntity<TaskResponse> createTask(
-    @RequestBody CreateTaskRequest request,
-    @AuthenticationPrincipal User user
-) {
-    Task task = taskService.createTask(request, user);
-    return ResponseEntity.ok(TaskResponse.from(task));
+        @Valid @RequestBody TaskRequest request,
+        @AuthenticationPrincipal UserPrincipal currentUser) {
+    TaskResponse task = taskService.createTask(request, currentUser);
+    return ResponseEntity.ok(task);
 }
 
 // 2. Service processa lógica
 @Service
+@RequiredArgsConstructor
 public class TaskService {
-    @Traced("TaskService.createTask")  // ← OpenTelemetry span
-    public Task createTask(CreateTaskRequest req, User user) {
-        // Cria entity
-        Task task = new Task();
-        task.setTitle(req.getTitle());
-        task.setUser(user);
-        
-        // Analisa com IA (se configurado)
-        if (aiService.isConfigured()) {
-            AIAnalysis analysis = aiService.analyzeTask(task);
-            task.setPriority(analysis.getPriority());
-            task.setTags(analysis.getTags());
-        }
-        
-        // Salva no banco
-        Task saved = taskRepository.save(task);
-        
-        // Registra métrica
-        metricsService.recordTaskCreated(user.getId());
-        
-        return saved;
+    @Traced(value = "TaskService.createTask", captureParameters = true)
+    public TaskResponse createTask(final TaskRequest request,
+            final UserPrincipal currentUser) {
+        final long startTime = System.currentTimeMillis();
+        User user = findUser(currentUser.getId());
+
+        Task task = Task.builder()
+                .title(request.getTitle())
+                .description(request.getDescription())
+                .status(resolveStatus(request.getStatus()))
+                .priority(request.getPriority())
+                .dueDate(request.getDueDate())
+                .estimatedHours(request.getEstimatedHours())
+                .tags(request.getTags())
+                .user(user)
+                .build();
+
+        Task savedTask = taskRepository.save(task);
+        metricsService.recordTaskCreated(savedTask.getPriority().toString());
+        recordDuration(startTime, "create");
+        return mapToResponse(savedTask);
     }
 }
 
@@ -631,9 +628,10 @@ public class TracingAspect {
 // 3. Uso
 @Service
 public class TaskService {
-    
-    @Traced("TaskService.createTask")  // ← Cria span automaticamente
-    public Task createTask(CreateTaskRequest req, User user) {
+
+    @Traced(value = "TaskService.createTask", captureParameters = true)
+    public TaskResponse createTask(TaskRequest request,
+            UserPrincipal currentUser) {
         // ...
     }
 }
@@ -643,28 +641,36 @@ public class TaskService {
 
 ```java
 @Component
+@Slf4j
 public class MetricsService {
-    
-    private final Counter taskCounter;
-    private final Histogram requestDuration;
-    
-    public MetricsService(MeterRegistry registry) {
-        this.taskCounter = Counter.builder("tasks.created")
-            .description("Total tasks created")
-            .tag("app", "smart-task")
-            .register(registry);
-            
-        this.requestDuration = Histogram.builder("ai.analysis.duration")
-            .description("AI analysis duration in ms")
-            .register(registry);
+
+    private final LongCounter taskCreatedCounter;
+    private final LongHistogram taskDurationHistogram;
+
+    public MetricsService(OpenTelemetry openTelemetry) {
+        Meter meter = openTelemetry.getMeter("smart-task-manager");
+        this.taskCreatedCounter = meter.counterBuilder("tasks.created")
+                .setDescription("Numero total de tarefas criadas")
+                .setUnit("tasks")
+                .build();
+        this.taskDurationHistogram = meter.histogramBuilder("tasks.duration")
+                .setDescription("Duracao de operacoes com tarefas")
+                .setUnit("ms")
+                .ofLongs()
+                .build();
+        log.info("MetricsService inicializado com metricas de telemetria");
     }
-    
-    public void recordTaskCreated(Long userId) {
-        taskCounter.increment();
+
+    public void recordTaskCreated(String priority) {
+        taskCreatedCounter.add(1, Attributes.builder()
+                .put("priority", priority)
+                .build());
     }
-    
-    public void recordAIAnalysis(long durationMs) {
-        requestDuration.record(durationMs);
+
+    public void recordTaskDuration(long durationMs, String operation) {
+        taskDurationHistogram.record(durationMs, Attributes.builder()
+                .put("operation", operation)
+                .build());
     }
 }
 ```
