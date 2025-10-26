@@ -113,7 +113,7 @@ public OpenTelemetry openTelemetry() {
 
 // DEPOIS: Apenas configuração do Tracer
 @Bean
-public Tracer tracer(final OpenTelemetry openTelemetry) {
+public Tracer tracer(OpenTelemetry openTelemetry) {
     log.info("Configurando Tracer OpenTelemetry para o servico: {}", applicationName);
     return openTelemetry.getTracer(applicationName, TRACER_VERSION);
 }
@@ -240,5 +240,4 @@ mvn spring-boot:run
 ---
 
 **Data:** Outubro 2025  
-**Autor:** GitHub Copilot  
 **Versão:** Smart Task AI v1.0.0
