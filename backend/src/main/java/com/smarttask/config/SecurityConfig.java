@@ -31,7 +31,7 @@ import java.util.List;
 @EnableWebSecurity
 @EnableMethodSecurity
 @RequiredArgsConstructor
-public final class SecurityConfig {
+public class SecurityConfig {
 
     /** Servico responsavel por carregar usuarios autenticaveis. */
     private final CustomUserDetailsService userDetailsService;

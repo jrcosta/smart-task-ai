@@ -20,7 +20,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
  */
 @Component
 @RequiredArgsConstructor
-public final class JwtAuthenticationFilter extends OncePerRequestFilter {
+public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     /** Numero de caracteres do prefixo "Bearer ". */
     private static final int BEARER_PREFIX_LENGTH = 7;
