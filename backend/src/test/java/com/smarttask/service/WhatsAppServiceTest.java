@@ -1,22 +1,49 @@
 package com.smarttask.service;
 
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import com.smarttask.observability.MetricsService;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatCode;
-
+@ExtendWith(MockitoExtension.class)
 class WhatsAppServiceTest {
 
-    @Test
-    void sendMessage_quandoSemCredenciais_naoDeveLancarExcecaoERetornarSucessoLogico() {
-        WhatsAppService svc = new WhatsAppService(); // Requer construtor padrão; ajuste se necessário
-        String to = "whatsapp:+5500000000000";
-        String msg = "Teste de notificação";
+    @Mock
+    private MetricsService metricsService;
 
-        assertThatCode(() -> {
-            boolean ok = svc.sendMessage(to, msg);
-            // Alguns serviços podem retornar ID/String; ajuste o assert conforme seu contrato
-            assertThat(ok).isTrue();
-        }).doesNotThrowAnyException();
+    @Mock
+    private SettingsService settingsService;
+
+    @InjectMocks
+    private WhatsAppService whatsAppService;
+
+    @BeforeEach
+    void configurarCampos() {
+        ReflectionTestUtils.setField(whatsAppService, "defaultAccountSid", "");
+        ReflectionTestUtils.setField(whatsAppService, "defaultAuthToken", "");
+        ReflectionTestUtils.setField(whatsAppService, "defaultTwilioWhatsAppNumber", "");
+    }
+
+    @Test
+    void sendTestMessage_semCredenciaisDeveSimularEnvioEMetricas() {
+        SettingsService.TwilioCredentials credentials =
+                new SettingsService.TwilioCredentials(
+                        null,
+                        null,
+                        null,
+                        "+5511999999999");
+        when(settingsService.getDecryptedTwilioCredentials(10L))
+                .thenReturn(credentials);
+
+        whatsAppService.sendTestMessage(10L, "Marina");
+
+        verify(metricsService).recordWhatsAppMessage("test_message");
     }
 }

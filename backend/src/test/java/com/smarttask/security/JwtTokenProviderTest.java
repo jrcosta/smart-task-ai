@@ -1,24 +1,41 @@
 package com.smarttask.security;
 
-import org.junit.jupiter.api.Test;
-
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+import java.util.List;
+import org.junit.jupiter.api.Test;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.test.util.ReflectionTestUtils;
 
 class JwtTokenProviderTest {
 
     @Test
-    void tokenGerado_deveSerValido_eConterSubject() {
-        // Ajuste a construção conforme sua implementação real
-        // Exemplos comuns:
-        // JwtTokenProvider provider = new JwtTokenProvider("test-secret-key-please-change", 3600000L);
-        // ou injete via setters/métodos de fábrica, se existirem
+    void tokenGerado_deveSerValido_eConterIdDoUsuario() {
         JwtTokenProvider provider = new JwtTokenProvider();
+        ReflectionTestUtils.setField(
+                provider,
+                "jwtSecret",
+                "test-secret-key-para-jwt-123456789012345");
+        ReflectionTestUtils.setField(provider, "jwtExpiration", 3_600_000L);
 
-        String username = "user@test.com";
-        String token = provider.generateToken(username);
+        UserPrincipal principal = new UserPrincipal(
+                7L,
+                "usuario",
+                "user@smarttask.ai",
+                "senha",
+                true,
+                List.of(new SimpleGrantedAuthority("ROLE_USER")));
+
+        Authentication authentication = mock(Authentication.class);
+        when(authentication.getPrincipal()).thenReturn(principal);
+
+        String token = provider.generateToken(authentication);
 
         assertThat(token).isNotBlank();
         assertThat(provider.validateToken(token)).isTrue();
-        assertThat(provider.getUsernameFromToken(token)).isEqualTo(username);
+        assertThat(provider.getUserIdFromToken(token)).isEqualTo(7L);
     }
 }

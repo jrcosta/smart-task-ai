@@ -1,36 +1,56 @@
 package com.smarttask.service;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.anyBoolean;
+import static org.mockito.Mockito.anyLong;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import com.smarttask.dto.AIAnalysisRequest;
+import com.smarttask.dto.AIAnalysisResponse;
+import com.smarttask.model.Task.TaskPriority;
+import com.smarttask.observability.MetricsService;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.context.ContextConfiguration;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-@ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = { AIService.class })
-@TestPropertySource(properties = {
-        "openai.apiKey="
-})
+@ExtendWith(MockitoExtension.class)
 class AIServiceTest {
 
-    // Quando AIService estiver anotado como @Service e usar injeção por @Value,
-    // prefira um teste com Spring Boot:
-    // @SpringBootTest(classes = AIService.class, properties = "openai.apiKey=")
-    // @Autowired AIService aiService;
+    @Mock
+    private MetricsService metricsService;
+
+    @Mock
+    private SettingsService settingsService;
+
+    @InjectMocks
+    private AIService aiService;
+
+    @BeforeEach
+    void configurarCampos() {
+        ReflectionTestUtils.setField(aiService, "defaultApiKey", "");
+        ReflectionTestUtils.setField(aiService, "model", "gpt-4o-mini");
+        ReflectionTestUtils.setField(aiService, "maxTokens", 256);
+    }
 
     @Test
-    void analyzeTask_quandoSemApiKey_deveRetornarAnaliseMock() {
-        AIService aiService = new AIService(); // Requer construtor padrão; ajuste se necessário
-        String desc = "Implementar login com JWT";
-        String analysis = aiService.analyzeTask(desc);
+    void analyzeTask_quandoNaoHaChave_deveRetornarFallback() {
+        when(settingsService.getDecryptedOpenAIKey(1L)).thenReturn(null);
 
-        assertThat(analysis).isNotBlank();
-        assertThat(analysis).contains("PRIORIDADE:");
-        assertThat(analysis).contains("TAGS:");
-        assertThat(analysis).contains("SUBTAREFAS:");
-        assertThat(analysis).contains("ANÁLISE:");
-        assertThat(analysis).contains("HORAS:");
+        AIAnalysisRequest request = new AIAnalysisRequest();
+        request.setText("Implementar login com JWT");
+
+        AIAnalysisResponse response = aiService.analyzeTask(request, 1L);
+
+        assertThat(response.getSuggestedPriority()).isEqualTo(TaskPriority.MEDIUM);
+        assertThat(response.getSuggestedTags()).contains("geral");
+        assertThat(response.getEstimatedHours()).isEqualTo(2);
+    verify(metricsService, never()).recordAIAnalysis(anyBoolean());
+        verify(metricsService).recordAIAnalysisDuration(anyLong());
     }
 }
