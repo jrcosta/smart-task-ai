@@ -38,9 +38,9 @@ fi
 echo "📋 Copiando arquivos da wiki..."
 REPO_ROOT="$(git rev-parse --show-toplevel)"
 
-# Verificar se há arquivos para copiar
-if [ -z "$(ls -A "$REPO_ROOT/$WIKI_DIR")" ]; then
-    echo "❌ Erro: Pasta wiki/ está vazia"
+# Verificar se há arquivos para copiar (mais eficiente)
+if [ -z "$(find "$REPO_ROOT/$WIKI_DIR" -maxdepth 1 -type f -print -quit 2>/dev/null)" ]; then
+    echo "❌ Erro: Pasta wiki/ está vazia ou não contém arquivos"
     cd - > /dev/null
     rm -rf "$TEMP_DIR"
     exit 1
@@ -62,9 +62,15 @@ echo "💾 Commitando mudanças..."
 git add .
 git commit -m "Atualizar wiki do repositório (sincronizado em $(date '+%Y-%m-%d %H:%M:%S'))"
 
-# Detectar branch padrão
+# Detectar branch padrão usando awk (mais robusto)
 echo "📤 Detectando branch padrão..."
-DEFAULT_BRANCH=$(git remote show origin 2>/dev/null | grep 'HEAD branch' | cut -d' ' -f5 || echo "master")
+DEFAULT_BRANCH=$(git remote show origin 2>/dev/null | grep 'HEAD branch' | awk '{print $NF}')
+
+# Validar se o branch detectado é válido
+if [ -z "$DEFAULT_BRANCH" ] || ! git rev-parse --verify "origin/$DEFAULT_BRANCH" >/dev/null 2>&1; then
+    DEFAULT_BRANCH="master"
+fi
+
 echo "📤 Enviando para branch: $DEFAULT_BRANCH"
 
 # Push para o repositório wiki

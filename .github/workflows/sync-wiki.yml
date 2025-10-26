@@ -37,10 +37,10 @@ jobs:
       - name: Sincronizar arquivos
         run: |
           # Copiar arquivos da wiki para o repositório wiki (inclui arquivos ocultos)
-          if [ -n "$(ls -A wiki/)" ]; then
+          if [ -n "$(find wiki/ -maxdepth 1 -type f -print -quit 2>/dev/null)" ]; then
             cp -r wiki/. /tmp/wiki/
           else
-            echo "⚠️ Pasta wiki/ está vazia"
+            echo "⚠️ Pasta wiki/ está vazia ou não contém arquivos"
             exit 1
           fi
 
@@ -60,9 +60,9 @@ jobs:
           git add .
           git commit -m "Atualizar wiki (sincronizado do repositório principal)"
 
-          # Detectar branch padrão e fazer push
-          DEFAULT_BRANCH=$(git remote show origin | grep 'HEAD branch' | cut -d' ' -f5)
-          if [ -z "$DEFAULT_BRANCH" ]; then
+          # Detectar branch padrão usando awk (mais robusto)
+          DEFAULT_BRANCH=$(git remote show origin 2>/dev/null | grep 'HEAD branch' | awk '{print $NF}')
+          if [ -z "$DEFAULT_BRANCH" ] || ! git rev-parse --verify "origin/$DEFAULT_BRANCH" >/dev/null 2>&1; then
             DEFAULT_BRANCH="master"
           fi
 
