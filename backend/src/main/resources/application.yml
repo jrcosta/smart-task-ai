@@ -59,6 +59,7 @@ twilio:
 management:
   otlp:
     tracing:
+      # Spring Boot 3.5 usa protocolo HTTP para OTLP por padrão (porta 4318), diferente do gRPC (porta 4317) usado em versões anteriores
       endpoint: ${OTEL_EXPORTER_OTLP_ENDPOINT:http://localhost:4318/v1/traces}
   endpoints:
     web:
