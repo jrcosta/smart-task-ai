@@ -34,7 +34,7 @@ services:
     image: prom/prometheus:latest
     container_name: smarttask-prometheus
     volumes:
-      - ./observability/prometheus.yml:/etc/prometheus/prometheus.yml
+      - ../observability/prometheus.yml:/etc/prometheus/prometheus.yml
       - prometheus_data:/prometheus
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
@@ -58,8 +58,8 @@ services:
       - GF_INSTALL_PLUGINS=grafana-piechart-panel
     volumes:
       - grafana_data:/var/lib/grafana
-      - ./observability/grafana/dashboards:/etc/grafana/provisioning/dashboards
-      - ./observability/grafana/datasources:/etc/grafana/provisioning/datasources
+      - ../observability/grafana/dashboards:/etc/grafana/provisioning/dashboards
+      - ../observability/grafana/datasources:/etc/grafana/provisioning/datasources
     ports:
       - "3001:3000"
     networks:
