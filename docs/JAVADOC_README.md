@@ -42,17 +42,17 @@ backend/target/site/apidocs/index.html
 ## ✨ Requisitos
 
 - ✅ Java 25 (instalado)
-- ✅ Maven 3.9.11 (instalado em `~/.maven/`)
-- ✅ Lombok 1.18.34 (no pom.xml)
+- ✅ Maven 3.9.x (disponível no PATH)
+- ✅ Lombok 1.18.40 (no pom.xml)
 
 ---
 
 ## 🔧 Configurado para:
 
 - **Java:** 25
-- **Spring Boot:** 3.2
-- **Maven:** 3.9.11
-- **Lombok:** 1.18.34
+- **Spring Boot:** 3.5
+- **Maven:** 3.9.x
+- **Lombok:** 1.18.40
 
 ---
 

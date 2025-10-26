@@ -24,7 +24,7 @@ Exemplos de comportamento inaceitável incluem:
 
 ## Aplicação
 
-Instâncias de comportamento abusivo, de assédio ou inaceitável podem ser reportadas entrando em contato com a equipe do projeto em jrcosta@github.com. Todas as reclamações serão revisadas e investigadas e resultarão em uma resposta considerada necessária e apropriada às circunstâncias.
+Instâncias de comportamento abusivo, de assédio ou inaceitável podem ser reportadas entrando em contato com a equipe do projeto em jr.icm.sc@gmail.com. Todas as reclamações serão revisadas e investigadas e resultarão em uma resposta considerada necessária e apropriada às circunstâncias.
 
 A equipe do projeto é obrigada a manter a confidencialidade em relação ao relator de um incidente.
 

@@ -4,7 +4,7 @@
 
 Se você descobrir uma vulnerabilidade de segurança, **NÃO** abra uma issue pública. Em vez disso, por favor envie um relatório privado para:
 
-📧 **jrcosta@github.com**
+📧 **jr.icm.sc@gmail.com**
 
 **Por favor inclua:**
 - Descrição da vulnerabilidade

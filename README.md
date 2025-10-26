@@ -3,7 +3,7 @@
 Um gerenciador de tarefas inteligente com integração de IA, desenvolvido com **Java Spring Boot** no backend e **React + TypeScript** no frontend.
 
 ![Java](https://img.shields.io/badge/Java-25-orange)
-![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.2-green)
+![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.5-green)
 ![React](https://img.shields.io/badge/React-19-blue)
 ![TypeScript](https://img.shields.io/badge/TypeScript-4.9-blue)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15-blue)
@@ -47,7 +47,7 @@ Um gerenciador de tarefas inteligente com integração de IA, desenvolvido com *
 
 ### Backend
 - **Java 25**
-- **Spring Boot 3.2** (Web, Data JPA, Security, Scheduling)
+- **Spring Boot 3.5** (Web, Data JPA, Security, Scheduling)
 - **Spring Security** com JWT
 - **PostgreSQL** / H2 (desenvolvimento)
 - **OpenAI Java Client**

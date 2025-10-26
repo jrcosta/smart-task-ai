@@ -155,7 +155,7 @@ Executa em:
 <plugin>
     <groupId>org.jacoco</groupId>
     <artifactId>jacoco-maven-plugin</artifactId>
-    <version>0.8.11</version>
+  <version>0.8.13</version>
 </plugin>
 ```
 
@@ -200,7 +200,7 @@ Executa em:
 ```
 [ ] Clonar repositório
 [ ] Instalar JDK 25
-[ ] Instalar Node.js 20.x
+[ ] Instalar Node.js 18+
 [ ] Instalar Maven 3.9.x
 [ ] npm install (frontend)
 [ ] mvn clean install (backend)

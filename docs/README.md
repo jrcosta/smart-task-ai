@@ -2,10 +2,10 @@
 
 Um gerenciador de tarefas inteligente com integração de IA, desenvolvido com **Java Spring Boot** no backend e **React + TypeScript** no frontend.
 
-![Java](https://img.shields.io/badge/Java-17-orange)
-![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.2-green)
-![React](https://img.shields.io/badge/React-18-blue)
-![TypeScript](https://img.shields.io/badge/TypeScript-5.2-blue)
+![Java](https://img.shields.io/badge/Java-25-orange)
+![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.5-green)
+![React](https://img.shields.io/badge/React-19-blue)
+![TypeScript](https://img.shields.io/badge/TypeScript-4.9-blue)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15-blue)
 
 ## ✨ Funcionalidades
@@ -36,8 +36,8 @@ Um gerenciador de tarefas inteligente com integração de IA, desenvolvido com *
 ## 🛠️ Tecnologias
 
 ### Backend
-- **Java 17**
-- **Spring Boot 3.2** (Web, Data JPA, Security, Scheduling)
+- **Java 25**
+- **Spring Boot 3.5** (Web, Data JPA, Security, Scheduling)
 - **Spring Security** com JWT
 - **PostgreSQL** / H2 (desenvolvimento)
 - **OpenAI Java Client**
@@ -46,7 +46,7 @@ Um gerenciador de tarefas inteligente com integração de IA, desenvolvido com *
 - **Lombok**
 
 ### Frontend
-- **React 18** com TypeScript
+- **React 19** com TypeScript
 - **Vite** (build tool)
 - **TailwindCSS** (estilização)
 - **React Router** (navegação)
@@ -58,7 +58,7 @@ Um gerenciador de tarefas inteligente com integração de IA, desenvolvido com *
 
 ## 📋 Pré-requisitos
 
-- **Java 17+**
+- **Java 25+**
 - **Node.js 18+**
 - **Maven 3.8+**
 - **PostgreSQL 15+** (ou use H2 para desenvolvimento)
@@ -70,17 +70,11 @@ Um gerenciador de tarefas inteligente com integração de IA, desenvolvido com *
 
 1. Clone o repositório:
 ```bash
-git clone https://github.com/seu-usuario/smart-task-manager.git
-cd smart-task-manager
+git clone https://github.com/jrcosta/smart-task-ai.git
+cd smart-task-ai
 ```
 
-2. Configure as variáveis de ambiente:
-```bash
-cp .env.example .env
-# Edite o arquivo .env com suas configurações
-```
-
-3. Execute com Docker Compose:
+2. Execute com Docker Compose:
 ```bash
 docker-compose up -d
 ```
@@ -100,13 +94,7 @@ docker-compose up -d
 cd backend
 ```
 
-3. Configure as variáveis de ambiente (opcional):
-```bash
-export JWT_SECRET=sua-chave-secreta
-export OPENAI_API_KEY=sua-chave-openai
-```
-
-4. Execute o backend:
+3. Execute o backend:
 ```bash
 mvn spring-boot:run
 ```

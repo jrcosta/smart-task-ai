@@ -222,7 +222,7 @@ Dia 21: Prepare para produção
 - `docs/API_DOCUMENTATION.md`
 
 ### 💻 Código Fonte
-- `backend/` (Spring Boot 3.2 + Java 25)
+- `backend/` (Spring Boot 3.5 + Java 25)
 - `frontend/` (React 19)
 - `backend/pom.xml` (dependências Maven)
 - `frontend/package.json` (dependências npm)
@@ -327,7 +327,7 @@ docker-compose -f docker-compose-unified.yml up -d
 - **Data**: Outubro 2025
 - **Versão do Projeto**: Smart Task AI v1.0.0
 - **Java**: 25 LTS
-- **Spring Boot**: 3.2
+- **Spring Boot**: 3.5
 - **React**: 19
 - **Docker Compose**: 3.8
 
